@@ -1308,9 +1308,6 @@ void handProfilerThread::printStatus() {
     t1=t;
 }
 
-void handProfilerThread::onStop() {
-}
-
 void handProfilerThread::clearGui() {
   Bottle& obj = guiPort.prepare();
   obj.clear();

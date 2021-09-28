@@ -181,11 +181,6 @@ public:
     */
     virtual void run();
 
-    /**
-    *  on stopping of the thread
-    */
-    void onStop();
-
     /*
     * function that sets the rootname of all the ports that are going to be created by the thread
     * @param str rootname

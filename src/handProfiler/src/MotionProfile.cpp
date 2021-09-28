@@ -1696,23 +1696,20 @@ void GVPMotionProfile::preComputation(const double t, const double theta) {
     //ONLY FOR CIRCLES: angular velocity constant to obtain constant tang.velocity
     //FOR ELLIPSE: compute angular velocity from A,B and desired tang.velocity
     radius = computeRadius(theta);
-    /*
-    double rDiff2     = (radius - radiusPrev) * (radius-radiusPrev);
-    double thetaDiff2 = (theta  - thetaPrev) * (theta - thetaPrev);
-    double sDiff2     = rDiff2  + (radius * radius) * thetaDiff2;
-    yInfo("rDiff2 %f thetaDiff2 %f radius %f sDiff %f", rDiff2, thetaDiff2, radius, sqrt(sDiff2));
-    */
-
-    /*
-    double drdtheta   = (radius - radiusPrev) / (theta - thetaPrev);
-    double drdtheta2  =  drdtheta * drdtheta;
-    double v2         = (drdtheta2 + (radius * radius)) * (angVelocity * angVelocity);
-    yInfo("v %f", sqrt(v2));
-    */
 
     yInfo("computed radius %f [m] for tangVelocity %f [m/s]", radius, tanVelocity);
     // computing angular velocity in function of the radius, theta, tangential velocity
-    angVelocity = computeAngVelocity(theta);
+    //angVelocity = computeAngVelocity(theta);
+
+    // Written by @Luca
+    //--------------------------------------------------------------------------
+    //IMPONGO LA VELOCITA TANGENZIALE E RICAVO LA VELOCITA ANGOLARE DA IMPORRE
+    // the formula is Tan_vel = r *ang_vel
+    tanVelocity = tanVelocity + 0.001;
+
+    angVelocity = tanVelocity / radius;
+    //--------------------------------------------------------------------------
+
     yInfo("computed angular velocity %f in rad/s", angVelocity);
     double tanVelocity_temp = checkTanVelocity(theta);
     yInfo("computed tang velocity %f in m/s", tanVelocity_temp);
@@ -1730,10 +1727,9 @@ Vector* GVPMotionProfile::compute(double t) {
         theta =  thetaPrev + reverse * (t - tprev) * angVelocity;
     }
 
-    Vector xdes = *xd;
+    Vector xdes = *xd; //perchè dichiarato qui ? @Luca
     if (inRange(theta) || theta == thetaStart) {
-        yInfo("In the range xAxis:%f yAxis:%f", xAxis,yAxis);
-        preComputation(t, theta);
+        preComputation(t, theta); //given theta, evaluate radius and ang vel
 
         (*xd)[0]=O[0] + radius * cos(theta) * AOnorm[0] + radius * sin(theta) * BOnorm[0];
         (*xd)[1]=O[1] + radius * cos(theta) * AOnorm[1] + radius * sin(theta) * BOnorm[1];
