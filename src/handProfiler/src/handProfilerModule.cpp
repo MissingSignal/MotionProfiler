@@ -23,64 +23,64 @@
 #include "iCub/handProfilerModule.h"
 
 // general command vocab's
-const int32_t  COMMAND_VOCAB_IS      = yarp::os::createVocab('i','s');
-const int32_t  COMMAND_VOCAB_OK      = yarp::os::createVocab('o','k');
-const int32_t  COMMAND_VOCAB_UP      = yarp::os::createVocab('U','P');
-const int32_t  COMMAND_VOCAB_ON      = yarp::os::createVocab('O','N');
+const int32_t  COMMAND_VOCAB_IS      = yarp::os::createVocab32('i','s');
+const int32_t  COMMAND_VOCAB_OK      = yarp::os::createVocab32('o','k');
+const int32_t  COMMAND_VOCAB_UP      = yarp::os::createVocab32('U','P');
+const int32_t  COMMAND_VOCAB_ON      = yarp::os::createVocab32('O','N');
 
 
-const int32_t  COMMAND_VOCAB_HELP    = yarp::os::createVocab('h','e','l','p');
-const int32_t  COMMAND_VOCAB_FAILED  = yarp::os::createVocab('f','a','i','l');
-const int32_t  COMMAND_VOCAB_TRED    = yarp::os::createVocab('t','r','e','d');
-const int32_t  COMMAND_VOCAB_TGRE    = yarp::os::createVocab('t','g','r','e');
-const int32_t  COMMAND_VOCAB_TBLU    = yarp::os::createVocab('t','b','l','u');
-const int32_t  COMMAND_VOCAB_FRED    = yarp::os::createVocab('f','r','e','d');       // request of fovea blob color (red)
-const int32_t  COMMAND_VOCAB_FBLU    = yarp::os::createVocab('f','b','l','u');       // request of fovea blob color (red)
-const int32_t  COMMAND_VOCAB_MINJ    = yarp::os::createVocab('m','i','n','j');
-const int32_t  COMMAND_VOCAB_TTPL    = yarp::os::createVocab('T','T','P','L');
-const int32_t  COMMAND_VOCAB_MANY    = yarp::os::createVocab('m','a','n','y');
-const int32_t  COMMAND_VOCAB_XAXI    = yarp::os::createVocab('X','A','X','I');
-const int32_t  COMMAND_VOCAB_YAXI    = yarp::os::createVocab('Y','A','X','I');
-const int32_t  COMMAND_VOCAB_ZAXI    = yarp::os::createVocab('Z','A','X','I');
-const int32_t  COMMAND_VOCAB_STAR    = yarp::os::createVocab('S','T','A','R');
-const int32_t  COMMAND_VOCAB_PALM    = yarp::os::createVocab('P','A','L','M');
-const int32_t  COMMAND_VOCAB_DOWN    = yarp::os::createVocab('D','O','W','N');
-const int32_t  COMMAND_VOCAB_CURR    = yarp::os::createVocab('C','U','R','R');
-const int32_t  COMMAND_VOCAB_SAVE    = yarp::os::createVocab('S','A','V','E');        //save action joints in a file
-const int32_t  COMMAND_VOCAB_FILE    = yarp::os::createVocab('F','I','L','E');        //
-const int32_t  COMMAND_VOCAB_SPEED   = yarp::os::createVocab('S','P','E','E');        //start movement from joints file
-const int32_t  COMMAND_VOCAB_MARK    = yarp::os::createVocab('M','A','R','K');        //to generate a time interval with start/stop
-const int32_t  COMMAND_VOCAB_STOP    = yarp::os::createVocab('S','T','O','P');        //
-const int32_t  COMMAND_VOCAB_SYNC    = yarp::os::createVocab('S','Y','N','C');        //set the time interval generated with MARK
-const int32_t  COMMAND_VOCAB_REPS    = yarp::os::createVocab('R','E','P','S');        //set the number of repetitions for file movement
-const int32_t  COMMAND_VOCAB_LOAD    = yarp::os::createVocab('L','O','A','D');        //load a file
-const int32_t  COMMAND_VOCAB_TIME    = yarp::os::createVocab('T','I','M','E');        //
-const int32_t  COMMAND_VOCAB_GRAS    = yarp::os::createVocab('G','R','A','S');        //grasp on
-const int32_t  COMMAND_VOCAB_PART    = yarp::os::createVocab('P','A','R','T');
+const int32_t  COMMAND_VOCAB_HELP    = yarp::os::createVocab32('h','e','l','p');
+const int32_t  COMMAND_VOCAB_FAILED  = yarp::os::createVocab32('f','a','i','l');
+const int32_t  COMMAND_VOCAB_TRED    = yarp::os::createVocab32('t','r','e','d');
+const int32_t  COMMAND_VOCAB_TGRE    = yarp::os::createVocab32('t','g','r','e');
+const int32_t  COMMAND_VOCAB_TBLU    = yarp::os::createVocab32('t','b','l','u');
+const int32_t  COMMAND_VOCAB_FRED    = yarp::os::createVocab32('f','r','e','d');       // request of fovea blob color (red)
+const int32_t  COMMAND_VOCAB_FBLU    = yarp::os::createVocab32('f','b','l','u');       // request of fovea blob color (red)
+const int32_t  COMMAND_VOCAB_MINJ    = yarp::os::createVocab32('m','i','n','j');
+const int32_t  COMMAND_VOCAB_TTPL    = yarp::os::createVocab32('T','T','P','L');
+const int32_t  COMMAND_VOCAB_MANY    = yarp::os::createVocab32('m','a','n','y');
+const int32_t  COMMAND_VOCAB_XAXI    = yarp::os::createVocab32('X','A','X','I');
+const int32_t  COMMAND_VOCAB_YAXI    = yarp::os::createVocab32('Y','A','X','I');
+const int32_t  COMMAND_VOCAB_ZAXI    = yarp::os::createVocab32('Z','A','X','I');
+const int32_t  COMMAND_VOCAB_STAR    = yarp::os::createVocab32('S','T','A','R');
+const int32_t  COMMAND_VOCAB_PALM    = yarp::os::createVocab32('P','A','L','M');
+const int32_t  COMMAND_VOCAB_DOWN    = yarp::os::createVocab32('D','O','W','N');
+const int32_t  COMMAND_VOCAB_CURR    = yarp::os::createVocab32('C','U','R','R');
+const int32_t  COMMAND_VOCAB_SAVE    = yarp::os::createVocab32('S','A','V','E');        //save action joints in a file
+const int32_t  COMMAND_VOCAB_FILE    = yarp::os::createVocab32('F','I','L','E');        //
+const int32_t  COMMAND_VOCAB_SPEED   = yarp::os::createVocab32('S','P','E','E');        //start movement from joints file
+const int32_t  COMMAND_VOCAB_MARK    = yarp::os::createVocab32('M','A','R','K');        //to generate a time interval with start/stop
+const int32_t  COMMAND_VOCAB_STOP    = yarp::os::createVocab32('S','T','O','P');        //
+const int32_t  COMMAND_VOCAB_SYNC    = yarp::os::createVocab32('S','Y','N','C');        //set the time interval generated with MARK
+const int32_t  COMMAND_VOCAB_REPS    = yarp::os::createVocab32('R','E','P','S');        //set the number of repetitions for file movement
+const int32_t  COMMAND_VOCAB_LOAD    = yarp::os::createVocab32('L','O','A','D');        //load a file
+const int32_t  COMMAND_VOCAB_TIME    = yarp::os::createVocab32('T','I','M','E');        //
+const int32_t  COMMAND_VOCAB_GRAS    = yarp::os::createVocab32('G','R','A','S');        //grasp on
+const int32_t  COMMAND_VOCAB_PART    = yarp::os::createVocab32('P','A','R','T');
 
 
-const int32_t  COMMAND_VOCAB_MAXDB   = yarp::os::createVocab('M','d','b');           // maximum dimension of the blob drawn
-const int32_t  COMMAND_VOCAB_MINDB   = yarp::os::createVocab('m','d','b');           // minimum dimension of the blob drawn
-const int32_t  COMMAND_VOCAB_MBA     = yarp::os::createVocab('m','B','A');           // minimum dimension of the bounding area
-const int32_t  COMMAND_VOCAB_SET     = yarp::os::createVocab('s','e','t');
-const int32_t  COMMAND_VOCAB_GET     = yarp::os::createVocab('g','e','t');
-const int32_t  COMMAND_VOCAB_GEN     = yarp::os::createVocab('G','E','N');
-const int32_t  COMMAND_VOCAB_CON     = yarp::os::createVocab('C','V','P');
-const int32_t  COMMAND_VOCAB_MJP     = yarp::os::createVocab('M','J','P');
-const int32_t  COMMAND_VOCAB_GVP     = yarp::os::createVocab('G','V','P');
-const int32_t  COMMAND_VOCAB_SIM     = yarp::os::createVocab('S','I','M');
-const int32_t  COMMAND_VOCAB_CLR     = yarp::os::createVocab('C','L','R');
-const int32_t  COMMAND_VOCAB_EXE     = yarp::os::createVocab('E','X','E');
-const int32_t  COMMAND_VOCAB_ROT     = yarp::os::createVocab('R','O','T');
-const int32_t  COMMAND_VOCAB_REV     = yarp::os::createVocab('R','E','V');
-const int32_t  COMMAND_VOCAB_RES     = yarp::os::createVocab('R','E','S');
-const int32_t  COMMAND_VOCAB_TTL     = yarp::os::createVocab('T','T','L');
-const int32_t  COMMAND_VOCAB_CUS     = yarp::os::createVocab('C','U','S');
-const int32_t  COMMAND_VOCAB_JOI     = yarp::os::createVocab('J','O','I');            //save action joints in a file
-const int32_t  COMMAND_VOCAB_OFF     = yarp::os::createVocab('O','F','F');
+const int32_t  COMMAND_VOCAB_MAXDB   = yarp::os::createVocab32('M','d','b');           // maximum dimension of the blob drawn
+const int32_t  COMMAND_VOCAB_MINDB   = yarp::os::createVocab32('m','d','b');           // minimum dimension of the blob drawn
+const int32_t  COMMAND_VOCAB_MBA     = yarp::os::createVocab32('m','B','A');           // minimum dimension of the bounding area
+const int32_t  COMMAND_VOCAB_SET     = yarp::os::createVocab32('s','e','t');
+const int32_t  COMMAND_VOCAB_GET     = yarp::os::createVocab32('g','e','t');
+const int32_t  COMMAND_VOCAB_GEN     = yarp::os::createVocab32('G','E','N');
+const int32_t  COMMAND_VOCAB_CON     = yarp::os::createVocab32('C','V','P');
+const int32_t  COMMAND_VOCAB_MJP     = yarp::os::createVocab32('M','J','P');
+const int32_t  COMMAND_VOCAB_GVP     = yarp::os::createVocab32('G','V','P');
+const int32_t  COMMAND_VOCAB_SIM     = yarp::os::createVocab32('S','I','M');
+const int32_t  COMMAND_VOCAB_CLR     = yarp::os::createVocab32('C','L','R');
+const int32_t  COMMAND_VOCAB_EXE     = yarp::os::createVocab32('E','X','E');
+const int32_t  COMMAND_VOCAB_ROT     = yarp::os::createVocab32('R','O','T');
+const int32_t  COMMAND_VOCAB_REV     = yarp::os::createVocab32('R','E','V');
+const int32_t  COMMAND_VOCAB_RES     = yarp::os::createVocab32('R','E','S');
+const int32_t  COMMAND_VOCAB_TTL     = yarp::os::createVocab32('T','T','L');
+const int32_t  COMMAND_VOCAB_CUS     = yarp::os::createVocab32('C','U','S');
+const int32_t  COMMAND_VOCAB_JOI     = yarp::os::createVocab32('J','O','I');            //save action joints in a file
+const int32_t  COMMAND_VOCAB_OFF     = yarp::os::createVocab32('O','F','F');
 
-const int32_t  COMMAND_VOCAB_GRAZ     = yarp::os::createVocab('G','R','A','Z');
-const int32_t  COMMAND_VOCAB_CVV      = yarp::os::createVocab('C','V','V');
+const int32_t  COMMAND_VOCAB_GRAZ     = yarp::os::createVocab32('G','R','A','Z');
+const int32_t  COMMAND_VOCAB_CVV      = yarp::os::createVocab32('C','V','V');
 
 
 using namespace yarp::os;
@@ -144,22 +144,22 @@ bool handProfilerModule::configure(yarp::os::ResourceFinder &rf) {
      */
     int  outputWidth       = rf.check("outputWidth",
                            Value(320),
-                           "output image width (int)").asInt();
+                           "output image width (int)").asInt32();
    string  part       = rf.check("part",
                           Value(""),
                           "selected part (string)").asString();
     int  outputHeight      = rf.check("outputHeight",
                            Value(240),
-                           "output image height (int)").asInt();
+                           "output image height (int)").asInt32();
     int  yawDof           = rf.check("yawDof",
                                      Value(0),
-                                     "value of the yawDofl(int)").asInt();
+                                     "value of the yawDofl(int)").asInt32();
     int  rollDof          = rf.check("rollDof",
                                      Value(0),
-                                     "value of the rollDof(int)").asInt();
+                                     "value of the rollDof(int)").asInt32();
     int  pitchDof         = rf.check("pitchDof",
                                      Value(0),
-                                     "value of the pitchRoll(int)").asInt();
+                                     "value of the pitchRoll(int)").asInt32();
 
     bool gazeTracking     = rf.check("gazeTracking");
     if(gazeTracking) {
@@ -245,11 +245,11 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
 
     mutex.wait();
 
-    switch (command.get(0).asVocab()) {
+    switch (command.get(0).asVocab32()) {
     case COMMAND_VOCAB_HELP:
         rec = true;
         {
-            reply.addVocab(Vocab::encode("many"));
+            reply.addVocab32(Vocab32::encode("many"));
             reply.addString("help");
             reply.addString("get fn \t: general get command");
             reply.addString("set s1 <s> \t: general set command");
@@ -260,7 +260,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
             reply.addString("GEN MJP  : generate minimum jerk profile");
 	          reply.addString("         : (((O -0.3 -0.1 0.1) (A -0.3 -0.0 0.1) (B -0.3 -0.1 0.2) (C -0.3 -0.1 0.0) (theta 0.0 1.57 4.71) (axes 0.1 0.1) (rev) (param 1.57 3.0)))");
             reply.addString("GEN GVP  : generate general velocity profile");
-            reply.addString("         : To be written");
+            reply.addString("         : (((O -0.3 0.0 0.1) (A -0.3 -0.1 0.1) (B -0.3 0.0 0.2) (C -0.3 0.0 0.0) (theta 0.0 1.57 4.71) (axes 0.1 0.1) (rev) (param 0.1))");
             reply.addString("GEN TTPL : generate NON two-third power law profile");
             reply.addString("         : (((O -0.3 -0.1 0.1) (A -0.3 -0.0 0.1) (B -0.3 -0.1 0.3) (C -0.3 -0.1 0.0) (theta 0.0 1.57 4.71) (axes 0.1 0.2) (rev) (param 0.1 0.33)))");
             reply.addString("GEN TTL : generate two-third power law profile");
@@ -292,43 +292,43 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
     case COMMAND_VOCAB_SET:
         rec = true;
         {
-            switch(command.get(1).asVocab()) {
+            switch(command.get(1).asVocab32()) {
             case COMMAND_VOCAB_MBA:
                 {
-                    double w = command.get(2).asDouble();
+                    double w = command.get(2).asFloat64();
                     cout << "set mBA: " << w << endl;
                     ok=true;
                 }
                 break;
             case COMMAND_VOCAB_MAXDB:
                 {
-                    int w = command.get(2).asInt();
+                    int w = command.get(2).asInt32();
                     ok=true;
                 }
                 break;
             case COMMAND_VOCAB_MINDB:
                 {
-                    int w = command.get(2).asInt();
+                    int w = command.get(2).asInt32();
                     ok=true;
                 }
                 break;
             case COMMAND_VOCAB_TRED:
                 {
-                    int t = command.get(2).asInt();
+                    int t = command.get(2).asInt32();
                     reply.addString("trg:");
                     ok=true;
                 }
                 break;
             case COMMAND_VOCAB_TGRE:
                 {
-                    int t = command.get(2).asInt();
+                    int t = command.get(2).asInt32();
                     reply.addString("trg:");
                     ok=true;
                 }
                 break;
             case COMMAND_VOCAB_TBLU:
                 {
-                    int t = command.get(2).asInt();
+                    int t = command.get(2).asInt32();
                     reply.addString("trg:");
                     ok=true;
                 }
@@ -343,21 +343,21 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
     case COMMAND_VOCAB_GET:
         rec = true;
         {
-            //reply.addVocab(COMMAND_VOCAB_IS);
+            //reply.addVocab32(COMMAND_VOCAB_IS);
             //reply.add(command.get(1));
-            switch(command.get(1).asVocab()) {
+            switch(command.get(1).asVocab32()) {
 
             case COMMAND_VOCAB_MAXDB:
                 {
 
-                    reply.addInt(0);
+                    reply.addInt32(0);
                     ok = true;
                 }
             break;
             case COMMAND_VOCAB_MINDB:
                 {
 
-                    reply.addInt(0);
+                    reply.addInt32(0);
                     ok = true;
                 }
                 break;
@@ -380,9 +380,9 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
     case COMMAND_VOCAB_PALM:
         rec = true;
         {
-            //reply.addVocab(COMMAND_VOCAB_IS);
+            //reply.addVocab32(COMMAND_VOCAB_IS);
             //reply.add(command.get(1));
-            switch(command.get(1).asVocab()) {
+            switch(command.get(1).asVocab32()) {
 
             case COMMAND_VOCAB_DOWN:
                 {
@@ -406,10 +406,10 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                 {
                     Bottle* b = command.get(2).asList();
                     Vector v(4);
-                    v(0) = b->get(0).asDouble();
-                    v(1) = b->get(1).asDouble();
-                    v(2) = b->get(2).asDouble();
-                    v(3) = b->get(3).asDouble();
+                    v(0) = b->get(0).asFloat64();
+                    v(1) = b->get(1).asFloat64();
+                    v(2) = b->get(2).asFloat64();
+                    v(3) = b->get(3).asFloat64();
                     yInfo("PALM CUSTOM setting to vector %s", v.toString().c_str());
                     //rThread->setOrientation(vectorUpOrientation);
                     if(v.size() == 4) {
@@ -432,7 +432,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
     case COMMAND_VOCAB_STAR:
         rec = true;
         {
-            switch(command.get(1).asVocab()) {
+            switch(command.get(1).asVocab32()) {
             case COMMAND_VOCAB_RES:
                 {
                     bool rev = false;
@@ -452,7 +452,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
 
                         if(command.size() == 3) {
                             yInfo("Looking for REV COMMAND");
-                            if(command.get(2).asVocab() == COMMAND_VOCAB_REV) {
+                            if(command.get(2).asVocab32() == COMMAND_VOCAB_REV) {
                                 yInfo("REV COMMAND found");
                                 rev = true;
                             }
@@ -474,10 +474,10 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
             break;
             case COMMAND_VOCAB_FILE:
                 {
-                    if(command.get(2).asVocab() == COMMAND_VOCAB_SPEED && 0!=rThread) {
-                        if(command.get(3).isDouble() || command.get(3).isInt()){
+                    if(command.get(2).asVocab32() == COMMAND_VOCAB_SPEED && 0!=rThread) {
+                        if(command.get(3).isFloat64() || command.get(3).isInt32()){
                             reply.addString("OK");
-                            rThread->startJoints(command.get(3).asDouble());
+                            rThread->startJoints(command.get(3).asFloat64());
                             ok = true;
                         }else{
                             // when we have SPEE command but no value
@@ -510,7 +510,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
     case COMMAND_VOCAB_SAVE:
         rec = true;
         {
-            switch(command.get(1).asVocab()) {
+            switch(command.get(1).asVocab32()) {
 
             case COMMAND_VOCAB_JOI:
                 {
@@ -536,7 +536,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
     case COMMAND_VOCAB_GRAS:
         rec = true;
         {
-            switch(command.get(1).asVocab()) {
+            switch(command.get(1).asVocab32()) {
             case COMMAND_VOCAB_ON:
                 {
                     if(0!=rThread) {
@@ -574,7 +574,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
     case COMMAND_VOCAB_GRAZ:
         rec = true;
         {
-            switch(command.get(1).asVocab()) {
+            switch(command.get(1).asVocab32()) {
             case COMMAND_VOCAB_CVV:
                 {
                     yInfo("activating grasp costant velocity with VIAPOINT");
@@ -646,7 +646,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
     case COMMAND_VOCAB_LOAD:
         rec = true;
         {
-            if(command.get(1).asVocab() == COMMAND_VOCAB_FILE) {
+            if(command.get(1).asVocab32() == COMMAND_VOCAB_FILE) {
                 if(0!=rThread) {
                     reply.addString("OK");
 
@@ -660,10 +660,10 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
     case COMMAND_VOCAB_REPS:
         rec = true;
         {
-            if(0!=rThread && command.get(1).asInt() != 0) {
+            if(0!=rThread && command.get(1).asInt32() != 0) {
               reply.addString("OK");
 
-              rThread->setRepsNumber(command.get(1).asInt());
+              rThread->setRepsNumber(command.get(1).asInt32());
 
             }
             ok = true;
@@ -672,7 +672,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
     case COMMAND_VOCAB_MARK:
         {
             rec = true;
-            switch(command.get(1).asVocab()) {
+            switch(command.get(1).asVocab32()) {
 
             case COMMAND_VOCAB_STAR:
                 {
@@ -701,10 +701,10 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
             case COMMAND_VOCAB_TIME:
                 {
 
-                    if(0!=rThread && command.get(2).asDouble() != 0) {
+                    if(0!=rThread && command.get(2).asFloat64() != 0) {
                         reply.addString("OK");
 
-                        rThread->setPartnerTime(command.get(2).asDouble());
+                        rThread->setPartnerTime(command.get(2).asFloat64());
 
                     }
                     ok = true;
@@ -734,7 +734,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
     case COMMAND_VOCAB_ROT:
         rec = true;
         {
-            switch(command.get(1).asVocab()) {
+            switch(command.get(1).asVocab32()) {
 
             case COMMAND_VOCAB_XAXI:
                 {
@@ -775,13 +775,13 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
     case COMMAND_VOCAB_SIM:
         rec = true;
         {
-            switch(command.get(1).asVocab()) {
+            switch(command.get(1).asVocab32()) {
 
             case COMMAND_VOCAB_CLR:
                 {
                     if(0!=rThread) {
-                        reply.addString("OK");
-
+                      rThread->clearGui();
+                      reply.addString("OK");
                     }
                     ok = true;
                 }
@@ -794,9 +794,9 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
         rec = true;
         {
             yInfo("GEN %s ", command.get(1).asString().c_str());
-            //reply.addVocab(COMMAND_VOCAB_IS);
+            //reply.addVocab32(COMMAND_VOCAB_IS);
             //reply.add(command.get(1));
-            switch(command.get(1).asVocab()) {
+            switch(command.get(1).asVocab32()) {
 
             case COMMAND_VOCAB_CON:
                 {
@@ -913,10 +913,10 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
     }
     if (!ok) {
         reply.clear();
-        reply.addVocab(COMMAND_VOCAB_FAILED);
+        reply.addVocab32(COMMAND_VOCAB_FAILED);
     }
     else{
-        reply.addVocab(COMMAND_VOCAB_OK);
+        reply.addVocab32(COMMAND_VOCAB_OK);
     }
 
     return ok;

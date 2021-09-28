@@ -169,7 +169,6 @@ void MotionProfile::setAxes(const double _xAxis,const double _yAxis) {
     yAxis = _yAxis;
 }
 
-
 double MotionProfile::computeRadius(const double theta) {
     double cos2theta = cos(theta) * cos(theta);
     double sin2theta = sin(theta) * sin(theta);
@@ -324,7 +323,7 @@ CVMotionProfile::CVMotionProfile(const Bottle& bInit) {
         //stringArray[j * 2 + 1].append("A");
         stringArray[j * 2 + 1].append(vector->get(0).asString().c_str());
         char temp[50];
-        sprintf(temp,"%f %f %f", vector->get(1).asDouble(), vector->get(2).asDouble(), vector->get(3).asDouble());
+        sprintf(temp,"%f %f %f", vector->get(1).asFloat64(), vector->get(2).asFloat64(), vector->get(3).asFloat64());
         yDebug("stringArray %s", stringArray[j * 2 + 1].c_str());
         stringArray[j * 2 + 2].append(&temp[0]);
         argv[j * 2 + 1] = (char*) stringArray[j * 2 + 1].c_str();
@@ -389,36 +388,36 @@ CVMotionProfile::CVMotionProfile(const Bottle& bInit) {
         //((xa,ya,za) (xb,yb,zb) (xc,yc,zc) (0,0.7853,1.5707) (0.1))
         Bottle* aVector = b->get(0).asList();
         Vector aVec(3);
-        aVec[0] = aVector->get(1).asDouble();
-        aVec[1] = aVector->get(2).asDouble();
-        aVec[2] = aVector->get(3).asDouble();
+        aVec[0] = aVector->get(1).asFloat64();
+        aVec[1] = aVector->get(2).asFloat64();
+        aVec[2] = aVector->get(3).asFloat64();
         yDebug("bottleA:%s", aVec.toString().c_str());
 
         Bottle* bVector = b->get(1).asList();
         Vector bVec(3);
-        bVec[0] = bVector->get(1).asDouble();
-        bVec[1] = bVector->get(2).asDouble();
-        bVec[2] = bVector->get(3).asDouble();
+        bVec[0] = bVector->get(1).asFloat64();
+        bVec[1] = bVector->get(2).asFloat64();
+        bVec[2] = bVector->get(3).asFloat64();
         yDebug("bottleB:%s", bVec.toString().c_str());
 
         Bottle* cVector = b->get(2).asList();
         Vector cVec(3);
-        cVec[0] = cVector->get(1).asDouble();
-        cVec[1] = cVector->get(2).asDouble();
-        cVec[2] = cVector->get(3).asDouble();
+        cVec[0] = cVector->get(1).asFloat64();
+        cVec[1] = cVector->get(2).asFloat64();
+        cVec[2] = cVector->get(3).asFloat64();
         yDebug("bottleC:%s", cVec.toString().c_str());
 
         Bottle* angles  = b->get(3).asList();
         yDebug("angles:%s", angles->toString().c_str());
-        setStartStop(angles->get(1).asDouble(), angles->get(2).asDouble(), angles->get(3).asDouble());
+        setStartStop(angles->get(1).asFloat64(), angles->get(2).asFloat64(), angles->get(3).asFloat64());
 
         Bottle* axis  = b->get(4).asList();
         yDebug("axis:%s", axis->toString().c_str());
-        setAxes(axis->get(1).asDouble(), axis->get(2).asDouble());
+        setAxes(axis->get(1).asFloat64(), axis->get(2).asFloat64());
 
         Bottle* params  = b->get(5).asList();
         yDebug("params:%s", params->toString().c_str());
-        setVelocity(params->get(1).asDouble());
+        setVelocity(params->get(1).asFloat64());
         setViaPoints(aVec, bVec, cVec);
         valid = true;
     }
@@ -435,12 +434,9 @@ CVMotionProfile::CVMotionProfile(const Bottle& bInit) {
     setViaPoints(Avector,Bvector,Cvector);
 }
 
-bool CVMotionProfile::operator==(const CVMotionProfile &cvmp)
-{
+bool CVMotionProfile::operator==(const CVMotionProfile &cvmp){
     return ((valid==cvmp.valid)&&(type==cvmp.type));
 }
-
-
 
 void CVMotionProfile::preComputation(const double t, const double theta) {
     //angular velocity expressed in frequency [Hz],
@@ -602,8 +598,8 @@ TTPLMotionProfile::TTPLMotionProfile(const Bottle& bInit) {
         //stringArray[j * 2 + 1].append("A");
         stringArray[j * 2 + 1].append(vector->get(0).asString().c_str());
         char temp[50];
-        yDebug("%f %f %f",vector->get(1).asDouble(), vector->get(2).asDouble(), vector->get(3).asDouble());
-        sprintf(temp,"%f %f %f", vector->get(1).asDouble(), vector->get(2).asDouble(), vector->get(3).asDouble());
+        yDebug("%f %f %f",vector->get(1).asFloat64(), vector->get(2).asFloat64(), vector->get(3).asFloat64());
+        sprintf(temp,"%f %f %f", vector->get(1).asFloat64(), vector->get(2).asFloat64(), vector->get(3).asFloat64());
 
         stringArray[j * 2 + 2].append(&temp[0]);
         yDebug("string: %s %s", stringArray[j * 2 + 1].c_str(), stringArray[j * 2 + 2].c_str());
@@ -671,36 +667,36 @@ TTPLMotionProfile::TTPLMotionProfile(const Bottle& bInit) {
         Bottle* aVector = b->get(0).asList();
         yDebug("bottleA:%s", aVector->toString().c_str());
         Vector aVec(3);
-        aVec[0] = aVector->get(1).asDouble();
-        aVec[1] = aVector->get(2).asDouble();
-        aVec[2] = aVector->get(3).asDouble();
+        aVec[0] = aVector->get(1).asFloat64();
+        aVec[1] = aVector->get(2).asFloat64();
+        aVec[2] = aVector->get(3).asFloat64();
 
         Bottle* bVector = b->get(1).asList();
         yDebug("bottleB:%s", bVector->toString().c_str());
         Vector bVec(3);
-        bVec[0] = bVector->get(1).asDouble();
-        bVec[1] = bVector->get(2).asDouble();
-        bVec[2] = bVector->get(3).asDouble();
+        bVec[0] = bVector->get(1).asFloat64();
+        bVec[1] = bVector->get(2).asFloat64();
+        bVec[2] = bVector->get(3).asFloat64();
 
         Bottle* cVector = b->get(2).asList();
         yDebug("bottleC:%s", cVector->toString().c_str());
         Vector cVec(3);
-        cVec[0] = cVector->get(1).asDouble();
-        cVec[1] = cVector->get(2).asDouble();
-        cVec[2] = cVector->get(3).asDouble();
+        cVec[0] = cVector->get(1).asFloat64();
+        cVec[1] = cVector->get(2).asFloat64();
+        cVec[2] = cVector->get(3).asFloat64();
 
         Bottle* angles  = b->get(3).asList();
         yDebug("angles:%s", angles->toString().c_str());
-        setStartStop(angles->get(1).asDouble(), angles->get(2).asDouble(), angles->get(3).asDouble());
+        setStartStop(angles->get(1).asFloat64(), angles->get(2).asFloat64(), angles->get(3).asFloat64());
 
         Bottle* axes  = b->get(4).asList();
         yDebug("axes:%s", axes->toString().c_str());
-        setAxes(axes->get(1).asDouble(), axes->get(2).asDouble());
+        setAxes(axes->get(1).asFloat64(), axes->get(2).asFloat64());
 
         Bottle* params  = b->get(5).asList();
         yDebug("params:%s", params->toString().c_str());
-        setGain(params->get(1).asDouble());
-        setBeta(params->get(2).asDouble());
+        setGain(params->get(1).asFloat64());
+        setBeta(params->get(2).asFloat64());
         setViaPoints(aVec, bVec, cVec);
         valid = true;
 
@@ -719,8 +715,7 @@ TTPLMotionProfile::TTPLMotionProfile(const Bottle& bInit) {
     setViaPoints(Avector,Bvector,Cvector);
 }
 
-bool TTPLMotionProfile::operator==(const TTPLMotionProfile &ttplmp)
-{
+bool TTPLMotionProfile::operator==(const TTPLMotionProfile &ttplmp){
     return ((valid==ttplmp.valid)&&(type==ttplmp.type));
 }
 
@@ -894,8 +889,8 @@ TwoThirdMotionProfile::TwoThirdMotionProfile(const Bottle& bInit) {
         //stringArray[j * 2 + 1].append("A");
         stringArray[j * 2 + 1].append(vector->get(0).asString().c_str());
         char temp[50];
-        //yDebug("%f %f %f",vector->get(1).asDouble(), vector->get(2).asDouble(), vector->get(3).asDouble());
-        sprintf(temp,"%f %f %f", vector->get(1).asDouble(), vector->get(2).asDouble(), vector->get(3).asDouble());
+        //yDebug("%f %f %f",vector->get(1).asFloat64(), vector->get(2).asFloat64(), vector->get(3).asFloat64());
+        sprintf(temp,"%f %f %f", vector->get(1).asFloat64(), vector->get(2).asFloat64(), vector->get(3).asFloat64());
 
         stringArray[j * 2 + 2].append(&temp[0]);
         //yDebug("string: %s %s", stringArray[j * 2 + 1].c_str(), stringArray[j * 2 + 2].c_str());
@@ -966,9 +961,9 @@ TwoThirdMotionProfile::TwoThirdMotionProfile(const Bottle& bInit) {
         Bottle* aVector = b->get(0).asList();
         yDebug("bottleA:%s", aVector->toString().c_str());
         Vector aVec(3);
-        aVec[0] = aVector->get(1).asDouble();
-        aVec[1] = aVector->get(2).asDouble();
-        aVec[2] = aVector->get(3).asDouble();
+        aVec[0] = aVector->get(1).asFloat64();
+        aVec[1] = aVector->get(2).asFloat64();
+        aVec[2] = aVector->get(3).asFloat64();
         xPrev[0] = aVec[0];
         xPrev[1] = aVec[1];
         xPrev[2] = aVec[2];
@@ -976,29 +971,29 @@ TwoThirdMotionProfile::TwoThirdMotionProfile(const Bottle& bInit) {
         Bottle* bVector = b->get(1).asList();
         yDebug("bottleB:%s", bVector->toString().c_str());
         Vector bVec(3);
-        bVec[0] = bVector->get(1).asDouble();
-        bVec[1] = bVector->get(2).asDouble();
-        bVec[2] = bVector->get(3).asDouble();
+        bVec[0] = bVector->get(1).asFloat64();
+        bVec[1] = bVector->get(2).asFloat64();
+        bVec[2] = bVector->get(3).asFloat64();
 
         Bottle* cVector = b->get(2).asList();
         yDebug("bottleC:%s", cVector->toString().c_str());
         Vector cVec(3);
-        cVec[0] = cVector->get(1).asDouble();
-        cVec[1] = cVector->get(2).asDouble();
-        cVec[2] = cVector->get(3).asDouble();
+        cVec[0] = cVector->get(1).asFloat64();
+        cVec[1] = cVector->get(2).asFloat64();
+        cVec[2] = cVector->get(3).asFloat64();
 
         Bottle* angles  = b->get(3).asList();
         yDebug("angles:%s", angles->toString().c_str());
-        setStartStop(angles->get(1).asDouble(), angles->get(2).asDouble(), angles->get(3).asDouble());
+        setStartStop(angles->get(1).asFloat64(), angles->get(2).asFloat64(), angles->get(3).asFloat64());
 
         Bottle* axes  = b->get(4).asList();
         yDebug("axes:%s", axes->toString().c_str());
-        setAxes(axes->get(1).asDouble(), axes->get(2).asDouble());
+        setAxes(axes->get(1).asFloat64(), axes->get(2).asFloat64());
 
         Bottle* params  = b->get(5).asList();
         yDebug("params:%s", params->toString().c_str());
-        setGain(params->get(1).asDouble());
-        setBeta(params->get(2).asDouble());
+        setGain(params->get(1).asFloat64());
+        setBeta(params->get(2).asFloat64());
         setViaPoints(aVec, bVec, cVec);
         valid = true;
 
@@ -1017,8 +1012,7 @@ TwoThirdMotionProfile::TwoThirdMotionProfile(const Bottle& bInit) {
     setViaPoints(Avector,Bvector,Cvector);
 }
 
-bool TwoThirdMotionProfile::operator==(const TwoThirdMotionProfile &ttplmp)
-{
+bool TwoThirdMotionProfile::operator==(const TwoThirdMotionProfile &ttplmp){
     return ((valid==ttplmp.valid)&&(type==ttplmp.type));
 }
 
@@ -1086,10 +1080,10 @@ double TwoThirdMotionProfile::computeCurvature(const double timeDiff, const doub
     //if (dataPort.getOutputCount()) {
         Bottle& dataBottle = dataPort.prepare();
         dataBottle.clear();
-        dataBottle.addDouble(xcur[0]); dataBottle.addDouble(xcur[1]); dataBottle.addDouble(xcur[2]); //position
-        dataBottle.addDouble((*xder1)[0]); dataBottle.addDouble((*xder1)[1]); dataBottle.addDouble((*xder1)[2]); //velocity
-        dataBottle.addDouble( xder2[0]); dataBottle.addDouble( xder2[1]); dataBottle.addDouble( xder2[2]); //acceleration
-        dataBottle.addDouble(d); dataBottle.addDouble(e); dataBottle.addDouble(k); //d, e, k
+        dataBottle.addFloat64(xcur[0]); dataBottle.addFloat64(xcur[1]); dataBottle.addFloat64(xcur[2]); //position
+        dataBottle.addFloat64((*xder1)[0]); dataBottle.addFloat64((*xder1)[1]); dataBottle.addFloat64((*xder1)[2]); //velocity
+        dataBottle.addFloat64( xder2[0]); dataBottle.addFloat64( xder2[1]); dataBottle.addFloat64( xder2[2]); //acceleration
+        dataBottle.addFloat64(d); dataBottle.addFloat64(e); dataBottle.addFloat64(k); //d, e, k
 
         //dataPort.setEnvelope(ts);
         dataPort.write();
@@ -1297,7 +1291,7 @@ MJMotionProfile::MJMotionProfile(const Bottle& bInit) {
         //stringArray[j * 2 + 1].append("A");
         stringArray[j * 2 + 1].append(vector->get(0).asString().c_str());
         char temp[50];
-        sprintf(temp,"%f %f %f", vector->get(1).asDouble(), vector->get(2).asDouble(), vector->get(3).asDouble());
+        sprintf(temp,"%f %f %f", vector->get(1).asFloat64(), vector->get(2).asFloat64(), vector->get(3).asFloat64());
         stringArray[j * 2 + 2].append(&temp[0]);
         argv[j * 2 + 1] = (char*) stringArray[j * 2 + 1].c_str();
         argv[j * 2 + 2] = (char*) stringArray[j * 2 + 2].c_str();
@@ -1358,37 +1352,37 @@ MJMotionProfile::MJMotionProfile(const Bottle& bInit) {
         //((xa,ya,za) (xb,yb,zb) (xc,yc,zc) (0,0.7853,1.5707) (0.1))
         Bottle* aVector = b->get(0).asList();
         Vector aVec(3);
-        aVec[0] = aVector->get(1).asDouble();
-        aVec[1] = aVector->get(2).asDouble();
-        aVec[2] = aVector->get(3).asDouble();
+        aVec[0] = aVector->get(1).asFloat64();
+        aVec[1] = aVector->get(2).asFloat64();
+        aVec[2] = aVector->get(3).asFloat64();
         yDebug("bottleA:%s", aVec.toString().c_str());
 
 
         Bottle* bVector = b->get(1).asList();
         Vector bVec(3);
-        bVec[0] = bVector->get(1).asDouble();
-        bVec[1] = bVector->get(2).asDouble();
-        bVec[2] = bVector->get(3).asDouble();
+        bVec[0] = bVector->get(1).asFloat64();
+        bVec[1] = bVector->get(2).asFloat64();
+        bVec[2] = bVector->get(3).asFloat64();
         yDebug("bottleB:%s", bVec.toString().c_str());
 
         Bottle* cVector = b->get(2).asList();
         Vector cVec(3);
-        cVec[0] = cVector->get(1).asDouble();
-        cVec[1] = cVector->get(2).asDouble();
-        cVec[2] = cVector->get(3).asDouble();
+        cVec[0] = cVector->get(1).asFloat64();
+        cVec[1] = cVector->get(2).asFloat64();
+        cVec[2] = cVector->get(3).asFloat64();
         yDebug("bottleC:%s", cVec.toString().c_str());
 
         Bottle* angles  = b->get(3).asList();
         yDebug("angles:%s", angles->toString().c_str());
-        setStartStop(angles->get(1).asDouble(), angles->get(2).asDouble(), angles->get(3).asDouble());
+        setStartStop(angles->get(1).asFloat64(), angles->get(2).asFloat64(), angles->get(3).asFloat64());
 
         Bottle* axis  = b->get(4).asList();
         yDebug("axis:%s", axis->toString().c_str());
-        setAxes(axis->get(1).asDouble(), axis->get(2).asDouble());
+        setAxes(axis->get(1).asFloat64(), axis->get(2).asFloat64());
 
         Bottle* params  = b->get(5).asList();
         yDebug("params:%s", params->toString().c_str());
-        setVelocity(params->get(1).asDouble());
+        setVelocity(params->get(1).asFloat64());
         setViaPoints(aVec, bVec, cVec);
         valid = true;
     }
@@ -1409,8 +1403,7 @@ MJMotionProfile::MJMotionProfile(const Bottle& bInit) {
     }
 }
 
-bool MJMotionProfile::operator==(const MJMotionProfile &cvmp)
-{
+bool MJMotionProfile::operator==(const MJMotionProfile &cvmp){
     return ((valid==cvmp.valid)&&(type==cvmp.type));
 }
 
@@ -1436,7 +1429,6 @@ double MJMotionProfile::computeTangVelocity(const double t) {
     double vel = distance * (15 * epsilon4  - 6 * epsilon5  - 10 * epsilon3);
     return vel;
 }
-
 
 void MJMotionProfile::preComputation(const double t, const double theta) {
     //angular velocity expressed in frequency [Hz],
@@ -1512,9 +1504,8 @@ Vector* MJMotionProfile::compute(double t) {
 }
 
 //**********************************************************************************************************************************************
-
 GVPMotionProfile::GVPMotionProfile(){
-    type = "GVP";
+    type = "CVP";
     valid = true;
     A.resize(3);
     B.resize(3);
@@ -1550,7 +1541,7 @@ GVPMotionProfile::~GVPMotionProfile(){
 }
 
 GVPMotionProfile::GVPMotionProfile(const Bottle& bInit) {
-    type = "GVP";
+    type = "CVP";
     valid = true;
     A.resize(3);
     B.resize(3);
@@ -1565,17 +1556,17 @@ GVPMotionProfile::GVPMotionProfile(const Bottle& bInit) {
     radiusPrev = 0.1;
 
     Bottle* b = bInit.get(0).asList();
-    yDebug("Analyzing the list of vectors from bottle b:%s", b->toString().c_str());
     ResourceFinder rf;
     rf.setVerbose(true);
-    //fix: max size would be 8 * 2 + 1; round it to 20 @amaroyo 18/01/2016
+	//fix: max size would be 8 * 2 + 1; round it to 20 @amaroyo 18/01/2016
     //int argc = b->size() * 2 + 1;
+	// fix:
 	const int argc = 20;
     string stringArray[argc];
     char* argv[argc];
     stringArray[0].append("./motionProfile");
     argv[0] = (char*) stringArray[0].c_str();
-    yDebug("added the first %s", argv[0]);
+    //yDebug("added first %s", argv[0]);
 
     for (int j = 0; j < b->size(); j++) {
         Bottle* vector = b->get(j).asList();
@@ -1583,16 +1574,19 @@ GVPMotionProfile::GVPMotionProfile(const Bottle& bInit) {
         //stringArray[j * 2 + 1].append("A");
         stringArray[j * 2 + 1].append(vector->get(0).asString().c_str());
         char temp[50];
-        sprintf(temp,"%f %f %f", vector->get(1).asDouble(), vector->get(2).asDouble(), vector->get(3).asDouble());
+        sprintf(temp,"%f %f %f", vector->get(1).asFloat64(), vector->get(2).asFloat64(), vector->get(3).asFloat64());
+        yDebug("stringArray %s", stringArray[j * 2 + 1].c_str());
         stringArray[j * 2 + 2].append(&temp[0]);
         argv[j * 2 + 1] = (char*) stringArray[j * 2 + 1].c_str();
         argv[j * 2 + 2] = (char*) stringArray[j * 2 + 2].c_str();
-        yDebug("param %s", argv[j * 2 + 1]);
-        yDebug("value %s", argv[j * 2 + 2]);
+        //yDebug("param %d %s", j, argv[j * 2 + 1]);
+        //yDebug("value %s", argv[j * 2 + 2]);
     }
+    yDebug("parsing ");
+    yDebug("%s",argv[0] );
+    yDebug("%s, %s",argv[1], argv[2] );
     // configuring the resource finder
-    //rf.configure(argc, argv);
-    yDebug("success %d", rf.configure(b->size() * 2 + 1, argv));
+    rf.configure(b->size() * 2 + 1, argv);
     yInfo("resorceFinder: %s",rf.toString().c_str());
     // visiting the parameters using the RF
     Vector Ovector(3);
@@ -1603,18 +1597,19 @@ GVPMotionProfile::GVPMotionProfile(const Bottle& bInit) {
                            Value("-0.3 -0.1 0.1"),
                            "position O (string)").asString();
     extractVector(Ostring, Ovector);
-    string  Astring = rf.check("A",
-                           Value("-0.3 0.0 -0.1"),
+    yDebug("got O value %s", Ovector.toString().c_str());
+    string Astring = rf.check("A",
+                           Value("-0.3 0.0 0.1"),
                            "position A (string)").asString();
     extractVector(Astring, Avector);
     yDebug("got A value %s", Avector.toString().c_str());
-    string  Bstring = rf.check("B",
-                           Value("-0.3 0.0 -0.1"),
+    string Bstring = rf.check("B",
+                           Value("-0.3 -0.1 0.3"),
                            "position B (string)").asString();
     extractVector(Bstring, Bvector);
     yDebug("got B value %s", Bvector.toString().c_str());
-    string  Cstring = rf.check("C",
-                           Value("-0.3 0.0 -0.1"),
+    string Cstring = rf.check("C",
+                           Value("-0.3 -0.2 0.1"),
                            "position C (string)").asString();
     extractVector(Cstring, Cvector);
     yDebug("got C value %s", Cvector.toString().c_str());
@@ -1644,41 +1639,41 @@ GVPMotionProfile::GVPMotionProfile(const Bottle& bInit) {
         //((xa,ya,za) (xb,yb,zb) (xc,yc,zc) (0,0.7853,1.5707) (0.1))
         Bottle* aVector = b->get(0).asList();
         Vector aVec(3);
-        aVec[0] = aVector->get(1).asDouble();
-        aVec[1] = aVector->get(2).asDouble();
-        aVec[2] = aVector->get(3).asDouble();
+        aVec[0] = aVector->get(1).asFloat64();
+        aVec[1] = aVector->get(2).asFloat64();
+        aVec[2] = aVector->get(3).asFloat64();
         yDebug("bottleA:%s", aVec.toString().c_str());
-
 
         Bottle* bVector = b->get(1).asList();
         Vector bVec(3);
-        bVec[0] = bVector->get(1).asDouble();
-        bVec[1] = bVector->get(2).asDouble();
-        bVec[2] = bVector->get(3).asDouble();
+        bVec[0] = bVector->get(1).asFloat64();
+        bVec[1] = bVector->get(2).asFloat64();
+        bVec[2] = bVector->get(3).asFloat64();
         yDebug("bottleB:%s", bVec.toString().c_str());
 
         Bottle* cVector = b->get(2).asList();
         Vector cVec(3);
-        cVec[0] = cVector->get(1).asDouble();
-        cVec[1] = cVector->get(2).asDouble();
-        cVec[2] = cVector->get(3).asDouble();
+        cVec[0] = cVector->get(1).asFloat64();
+        cVec[1] = cVector->get(2).asFloat64();
+        cVec[2] = cVector->get(3).asFloat64();
         yDebug("bottleC:%s", cVec.toString().c_str());
 
         Bottle* angles  = b->get(3).asList();
         yDebug("angles:%s", angles->toString().c_str());
-        setStartStop(angles->get(1).asDouble(), angles->get(2).asDouble(), angles->get(3).asDouble());
+        setStartStop(angles->get(1).asFloat64(), angles->get(2).asFloat64(), angles->get(3).asFloat64());
 
         Bottle* axis  = b->get(4).asList();
         yDebug("axis:%s", axis->toString().c_str());
-        setAxes(axis->get(1).asDouble(), axis->get(2).asDouble());
+        setAxes(axis->get(1).asFloat64(), axis->get(2).asFloat64());
 
         Bottle* params  = b->get(5).asList();
         yDebug("params:%s", params->toString().c_str());
-        setVelocity(params->get(1).asDouble());
+        setVelocity(params->get(1).asFloat64());
         setViaPoints(aVec, bVec, cVec);
         valid = true;
     }
     setCenter(Ovector);
+    setReverse(reverse);
     setStartStop(thetaVector[0], thetaVector[1], thetaVector[2]);
     setAxes(axisVector[0], axisVector[1]);
     setVelocity(paramVector[0]);
@@ -1686,44 +1681,13 @@ GVPMotionProfile::GVPMotionProfile(const Bottle& bInit) {
     array[0] = Avector;
     array[1] = Bvector;
     array[2] = Cvector;
-    if(sanityCheck(array, 3)) {
-        valid = true;
-        setViaPoints(Avector,Bvector,Cvector);
-    }
-    else {
-        yError("Error positions are not allowed!");
-    }
+    valid = true;
+    setViaPoints(Avector,Bvector,Cvector);
 }
 
-bool GVPMotionProfile::operator==(const GVPMotionProfile &cvmp)
-{
+bool GVPMotionProfile::operator==(const GVPMotionProfile &cvmp){
     return ((valid==cvmp.valid)&&(type==cvmp.type));
 }
-
-double GVPMotionProfile::computeTangVelocity(const double t) {
-
-    // thetaGoal = 1.57;
-    // double goalRadius = computeRadius(thetaGoal);
-    // Vector goal(3);
-    // goal[0]=O[0] + goalRadius * cos(thetaGoal) * AOnorm[0] + goalRadius * sin(thetaGoal) * BOnorm[0];
-    // goal[1]=O[1] + goalRadius * cos(thetaGoal) * AOnorm[1] + goalRadius * sin(thetaGoal) * BOnorm[1];
-    // goal[2]=O[2] + goalRadius * cos(thetaGoal) * AOnorm[2] + goalRadius * sin(thetaGoal) * BOnorm[2];
-    // Vector distanceVect = goal - (*xd);
-    // //yDebug("distanceVector: %s", distanceVect.toString().c_str());
-    // double distance = sqrt(distanceVect[0] * distanceVect[0] + distanceVect[1] * distanceVect[1] + distanceVect[2] * distanceVect[2]);
-    // //yDebug("distance:%f", distance);
-    // double epsilon = (t - t0) / (tfinal - t0);
-    // //yDebug("epsilon:%f t:%f tfinal:%f", epsilon, t, tfinal);
-    // double epsilon3 = epsilon * epsilon * epsilon;
-    // double epsilon4 = epsilon3 * epsilon;
-    // double epsilon5 = epsilon4 * epsilon;
-    // double vel = distance * (15 * epsilon4  - 6 * epsilon5  - 10 * epsilon3);
-    // double vettore [5] = { 0.1, 0.1, 0.1, 0.1, 0.1, 0.1};
-    // vel=vettore[t];
-
-    return 0.1;
-}
-
 
 void GVPMotionProfile::preComputation(const double t, const double theta) {
     //angular velocity expressed in frequency [Hz],
@@ -1732,68 +1696,64 @@ void GVPMotionProfile::preComputation(const double t, const double theta) {
     //ONLY FOR CIRCLES: angular velocity constant to obtain constant tang.velocity
     //FOR ELLIPSE: compute angular velocity from A,B and desired tang.velocity
     radius = computeRadius(theta);
-    tanVelocity = computeTangVelocity(t);
-    //yInfo("computed radius %f [m] for tangVelocity %f [m/s]", radius, tanVelocity);
+    /*
+    double rDiff2     = (radius - radiusPrev) * (radius-radiusPrev);
+    double thetaDiff2 = (theta  - thetaPrev) * (theta - thetaPrev);
+    double sDiff2     = rDiff2  + (radius * radius) * thetaDiff2;
+    yInfo("rDiff2 %f thetaDiff2 %f radius %f sDiff %f", rDiff2, thetaDiff2, radius, sqrt(sDiff2));
+    */
+
+    /*
+    double drdtheta   = (radius - radiusPrev) / (theta - thetaPrev);
+    double drdtheta2  =  drdtheta * drdtheta;
+    double v2         = (drdtheta2 + (radius * radius)) * (angVelocity * angVelocity);
+    yInfo("v %f", sqrt(v2));
+    */
+
+    yInfo("computed radius %f [m] for tangVelocity %f [m/s]", radius, tanVelocity);
     // computing angular velocity in function of the radius, theta, tangential velocity
     angVelocity = computeAngVelocity(theta);
-    //yInfo("computed angular velocity %f in rad/s", angVelocity);
+    yInfo("computed angular velocity %f in rad/s", angVelocity);
     double tanVelocity_temp = checkTanVelocity(theta);
-    //yInfo("computed tang velocity %f in m/s", tanVelocity_temp);
+    yInfo("computed tang velocity %f in m/s", tanVelocity_temp);
     //double theta = 2.0 * M_PI * angVelocity * (t - t0);
-    //yInfo("theta angle [rad] %f", theta);
-
+    yInfo("theta angle [rad] %f", theta);
 }
 
 Vector* GVPMotionProfile::compute(double t) {
-  double thetaStart;
-  if(t-t0 == 0) {
-      theta = thetaA;
-      thetaStart =  thetaA;
-  }
-  else {
-      theta =  thetaPrev + reverse * (t - tprev) * angVelocity;
-  }
+    double thetaStart;
+    if(t-t0 == 0) {
+        theta = thetaA;
+        thetaStart =  thetaA;
+    }
+    else {
+        theta =  thetaPrev + reverse * (t - tprev) * angVelocity;
+    }
 
-  Vector xdes = *xd;
-  if(theta == thetaStart) {
-      yInfo("theta=thetaStart check");
-      preComputation(t, theta);
-      //(*xd)[0]=O[0] + xAxis * cos(theta) * AO[0] + yAxis * sin(theta) * BO[0];
-      //(*xd)[1]=O[1] + xAxis * cos(theta) * AO[1] + yAxis * sin(theta) * BO[1];
-      //(*xd)[2]=O[2] + xAxis * cos(theta) * AO[2] + yAxis * sin(theta) * BO[2];
-      (*xd)[0]=O[0] + radius * cos(theta) * AOnorm[0] + radius * sin(theta) * BOnorm[0];
-      (*xd)[1]=O[1] + radius * cos(theta) * AOnorm[1] + radius * sin(theta) * BOnorm[1];
-      (*xd)[2]=O[2] + radius * cos(theta) * AOnorm[2] + radius * sin(theta) * BOnorm[2];
-      if( ((*xd)[0]!=A[0]) || ((*xd)[1]!=A[1]) || ((*xd)[2]!=A[2]) ){
-          yInfo("Beware: difference between desired location A and computed position!");
-          yInfo("vector xdes: %s", xd->toString().c_str());
-          //Time::delay(5.0);
-      }
-  }
-  else if (inRange(theta) /*(theta > thetaA) && (theta<=thetaC)*/) {
-      yInfo("In the range xAxis:%f yAxis:%f", xAxis,yAxis);
-      preComputation(t, theta);
-      //(*xd)[0]=O[0] + xAxis * cos(theta) * AO[0] + yAxis * sin(theta) * BO[0];
-      //(*xd)[1]=O[1] + xAxis * cos(theta) * AO[1] + yAxis * sin(theta) * BO[1];
-      //(*xd)[2]=O[2] + xAxis * cos(theta) * AO[2] + yAxis * sin(theta) * BO[2];
-      (*xd)[0]=O[0] + radius * cos(theta) * AOnorm[0] + radius * sin(theta) * BOnorm[0];
-      (*xd)[1]=O[1] + radius * cos(theta) * AOnorm[1] + radius * sin(theta) * BOnorm[1];
-      (*xd)[2]=O[2] + radius * cos(theta) * AOnorm[2] + radius * sin(theta) * BOnorm[2];
+    Vector xdes = *xd;
+    if (inRange(theta) || theta == thetaStart) {
+        yInfo("In the range xAxis:%f yAxis:%f", xAxis,yAxis);
+        preComputation(t, theta);
 
-      yInfo("xdes %s", xd->toString().c_str());
-  }
-  else {
-      return NULL;
-  }
+        (*xd)[0]=O[0] + radius * cos(theta) * AOnorm[0] + radius * sin(theta) * BOnorm[0];
+        (*xd)[1]=O[1] + radius * cos(theta) * AOnorm[1] + radius * sin(theta) * BOnorm[1];
+        (*xd)[2]=O[2] + radius * cos(theta) * AOnorm[2] + radius * sin(theta) * BOnorm[2];
 
-  Vector distance = (*xd) - xPrev;
-  yInfo("travelled distance x = %f , travelled distance y = %f absolute = %f", distance[1]/(t-tprev), distance[2]/(t-tprev),
-  sqrt(distance[1] * distance[1] + distance[2] * distance[2])/(t-tprev));
+        yInfo("xdes %s", xd->toString().c_str());
+    }
+    else {
+        return NULL;
+    }
 
-  // updating the previous incremental step values
-  radiusPrev =  radius;
-  thetaPrev = theta;
-  tprev     = t;
-  xPrev = (*xd);
-  return xd;
+    Vector distance = (*xd) - xPrev;
+    yInfo("travelled distance x = %f , travelled distance y = %f absolute = %f", distance[1]/(t-tprev), distance[2]/(t-tprev),
+    sqrt(distance[1] * distance[1] + distance[2] * distance[2])/(t-tprev));
+
+    // updating the previous incremental step values
+    radiusPrev =  radius;
+    thetaPrev = theta;
+    tprev     = t;
+    xPrev = (*xd);
+    return xd;
+
 }

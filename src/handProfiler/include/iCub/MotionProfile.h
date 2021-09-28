@@ -341,17 +341,16 @@ public:
 class GVPMotionProfile : public MotionProfile {
 protected:
 
-    double tfinal;
-    double thetaGoal;
+    //double velocity;          // desired tangential velocity
 
 public:
     GVPMotionProfile();
     ~GVPMotionProfile();
-    GVPMotionProfile(const GVPMotionProfile &mjmp);
+    GVPMotionProfile(const GVPMotionProfile &cvmp);
     GVPMotionProfile(const yarp::os::Bottle &b);
 
-    GVPMotionProfile &operator=(const GVPMotionProfile &mjmp);
-    bool operator==(const GVPMotionProfile &mjmp);
+    GVPMotionProfile &operator=(const GVPMotionProfile &cvmp);
+    bool operator==(const GVPMotionProfile &cvmp);
     bool operator==(const MotionProfile &mp) {return operator==(dynamic_cast<const GVPMotionProfile&>(mp));}
 
     /**
@@ -359,11 +358,6 @@ public:
     */
     void setVelocity(const double vel) {tanVelocity = vel;};
     void preComputation(const double t, const double theta);
-    /**
-    * function that computes the tangVelocity according to the min-jerk constraint
-    */
-    double computeTangVelocity(const double t);
-
     yarp::sig::Vector* compute(double t);
 };
 

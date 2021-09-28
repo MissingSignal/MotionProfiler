@@ -410,6 +410,11 @@ public:
     * function that prints out the linearVelocity of the end-effector
     */
     void printVel();
+
+    /**
+    * function that clears the iCubGui
+    */
+    void clearGui();
 };
 
 #endif  //_HAND_PROFILER_THREAD_H_

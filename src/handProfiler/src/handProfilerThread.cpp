@@ -54,9 +54,7 @@ FingerProfile* factoryCVVFingerProfile(){
     return static_cast<FingerProfile*>(fingerProfile);
 }
 
-
 //********************* factories for motion profiles ***********************************
-
 MotionProfile* factoryCVMotionProfile(const Bottle &param){
     CVMotionProfile *cvmp = new CVMotionProfile(param);
     if(!cvmp->isValid()){
@@ -153,7 +151,6 @@ handProfilerThread::handProfilerThread(): RateThread(RATETHREAD) {
 
 }
 
-
 handProfilerThread::handProfilerThread(string _robot, string _configFile, ResourceFinder rf): RateThread(RATETHREAD){
     robot = _robot;
     configFile = _configFile;
@@ -182,8 +179,6 @@ handProfilerThread::handProfilerThread(string _robot, string _configFile, Resour
     cartesianEventParameters.motionOngoingCheckPoint=0.2;
 
 }
-
-
 
 handProfilerThread::~handProfilerThread() {
     // do nothing
@@ -600,6 +595,7 @@ bool handProfilerThread::startSimulation(const bool _reverse){
     t0 = Time::now();
 	return true;
 }
+
 bool handProfilerThread::startResetting(){
     //count = 0;
     //mp->setReverse(_reverse);
@@ -849,20 +845,6 @@ void handProfilerThread::graspReset(){
     //yDebug("%f %f %f %f %f %f %f %f %f",graspCurrent[0],graspCurrent[1],graspCurrent[2],graspCurrent[3],graspCurrent[4],graspCurrent[5],graspCurrent[6],graspCurrent[7],graspCurrent[8]);
     encs->getEncoders(fingerJoints.data());
     //yDebug("%f %f %f %f %f %f %f %f %f",fingerJoints[7],fingerJoints[8],fingerJoints[9],fingerJoints[10],fingerJoints[11],fingerJoints[12],fingerJoints[13],fingerJoints[14],fingerJoints[15]);
-
-
-///////////////////////////////////////////////// PROVA CHIUSURA
-// GEN TTL (((O -0.25 -0.15 0.0) (A -0.25 -0.25 0.0) (B -0.25 -0.15 0.05) (C -0.25 -0.05 0.0) (theta 0.0 1.57 3.14) (axes 0.1 0.05) (param 0.01 0.33)))
-
-    /*while(graspCurrent[8]<graspFinal[8]){
-        for(int i = 0; i<9; i++){
-            graspCurrent[i] = graspCurrent[i]+((graspFinal[i]-graspHome[i])/300);
-            //yWarning("current %f       amount %f        final %f", target[i+7], ((graspFinal[i]-graspHome[i])/200), (*nextPosition)[i]);
-        }
-
-        idir->setPositions(graspNumber, graspJoints, graspCurrent.data());
-    }*/
-
 }
 
 void handProfilerThread::printErr() {
@@ -870,8 +852,8 @@ void handProfilerThread::printErr() {
     ts.update();
     Bottle& b = errPort.prepare();
     b.clear();
-    //b.addDouble(mp->getError());
-    b.addDouble(-1.0);
+    //b.addFloat64(mp->getError());
+    b.addFloat64(-1.0);
     errPort.setEnvelope(ts);
     errPort.write();
 }
@@ -881,10 +863,10 @@ void handProfilerThread::printVel() {
     ts.update();
     Bottle& b = velPort.prepare();
     b.clear();
-    b.addDouble(mp->getTanVelocity());
-    b.addDouble(mp->getCurvature());
-    b.addDouble(mp->getRadius());
-    b.addDouble(mp->getAngVelocity());
+    b.addFloat64(mp->getTanVelocity());
+    b.addFloat64(mp->getCurvature());
+    b.addFloat64(mp->getRadius());
+    b.addFloat64(mp->getAngVelocity());
     velPort.setEnvelope(ts);
     velPort.write();
 }
@@ -894,9 +876,9 @@ void handProfilerThread::printXd() {
     ts.update();
     Bottle& b = xdPort.prepare();
     b.clear();
-    b.addDouble(xd[0]);
-    b.addDouble(xd[1]);
-    b.addDouble(xd[2]);
+    b.addFloat64(xd[0]);
+    b.addFloat64(xd[1]);
+    b.addFloat64(xd[2]);
     xdPort.setEnvelope(ts);
     xdPort.write();
 }
@@ -1226,24 +1208,24 @@ void handProfilerThread::displayProfile() {
             obj.addString(objectName[i]);
             // object dimensions in millimiters
             // (it will be displayed as an ellipsoid with the tag "my_object_name")
-            obj.addDouble(5);
-            obj.addDouble(5);
-            obj.addDouble(5);
+            obj.addFloat64(5);
+            obj.addFloat64(5);
+            obj.addFloat64(5);
             // object position in millimiters
             // reference frame: X=fwd, Y=left, Z=up
-            obj.addDouble((vectorList[i])[0] * 1000);
-            obj.addDouble((vectorList[i])[1] * 1000);
-            obj.addDouble((vectorList[i])[2] * 1000);
+            obj.addFloat64((vectorList[i])[0] * 1000);
+            obj.addFloat64((vectorList[i])[1] * 1000);
+            obj.addFloat64((vectorList[i])[2] * 1000);
             // object orientation (roll, pitch, yaw) in degrees
-            obj.addDouble(0.0);
-            obj.addDouble(0.0);
-            obj.addDouble(0.0);
+            obj.addFloat64(0.0);
+            obj.addFloat64(0.0);
+            obj.addFloat64(0.0);
             // object color (0-255)
-            obj.addInt(r);
-            obj.addInt(g);
-            obj.addInt(b);
+            obj.addInt32(r);
+            obj.addInt32(g);
+            obj.addInt32(b);
             // transparency (0.0=invisible 1.0=solid)
-            obj.addDouble(1.0);
+            obj.addFloat64(1.0);
 
             guiPort.writeStrict();
         }
@@ -1263,67 +1245,37 @@ void handProfilerThread::displayTarget() {
         Bottle& obj = guiPort.prepare();
         obj.clear();
         obj.addString("object"); // command to add/update an object
+        //EXPLAINATION by @Luca
+        //if you create object with the same name it will overwrite the existing object
+        //the module creates many different objects but it's a mess !
         string str("");
         sprintf((char*)str.c_str(),"%d",count);
         yInfo("displaying %s", str.c_str());
-        obj.addString(str.c_str());
+        obj.addString(str.c_str()); //Commented by @Luca
         // object dimensions in millimiters
         // (it will be displayed as an ellipsoid with the tag "my_object_name")
-        obj.addDouble(5);
-        obj.addDouble(5);
-        obj.addDouble(5);
+        obj.addFloat64(5);
+        obj.addFloat64(5);
+        obj.addFloat64(5);
         // object position in millimiters
         // reference frame: X=fwd, Y=left, Z=up
-        obj.addDouble(xd[0] * 1000);
-        obj.addDouble(xd[1] * 1000);
-        obj.addDouble(xd[2] * 1000);
+        obj.addFloat64(xd[0] * 1000);
+        obj.addFloat64(xd[1] * 1000);
+        obj.addFloat64(xd[2] * 1000);
         // object orientation (roll, pitch, yaw) in degrees
-        obj.addDouble(0.0);
-        obj.addDouble(0.0);
-        obj.addDouble(0.0);
+        obj.addFloat64(0.0);
+        obj.addFloat64(0.0);
+        obj.addFloat64(0.0);
         // object color (0-255)
-        obj.addInt(r);
-        obj.addInt(g);
-        obj.addInt(b);
+        obj.addInt32(r);
+        obj.addInt32(g);
+        obj.addInt32(b);
         // transparency (0.0=invisible 1.0=solid)
-        obj.addDouble(1.0);
+        obj.addFloat64(1.0);
 
         guiPort.writeStrict();
     }
 }
-
-/*void handProfilerThread::printStatus() {
-    if (t-t1>=PRINT_STATUS_PER) {
-        Vector x,o,xdhat,odhat,qdhat;
-
-        // we get the current arm pose in the
-        // operational space
-        icart->getPose(x,o);
-
-        // we get the final destination of the arm
-        // as found by the solver: it differs a bit
-        // from the desired pose according to the tolerances
-        icart->getDesired(xdhat,odhat,qdhat);
-
-        double e_xdhat=norm(xdhat-x);
-        double e_o=norm(odhat-o);
-        double e_xd=norm(xd-x);
-
-        fprintf(stdout,"+++++++++\n");
-        fprintf(stdout,"xd          [m] = %s\n",xd.toString().c_str());
-        fprintf(stdout,"xdhat       [m] = %s\n",xdhat.toString().c_str());
-        fprintf(stdout,"x           [m] = %s\n",x.toString().c_str());
-        fprintf(stdout,"od        [rad] = %s\n",od.toString().c_str());
-        fprintf(stdout,"odhat     [rad] = %s\n",odhat.toString().c_str());
-        fprintf(stdout,"o         [rad] = %s\n",o.toString().c_str());
-        fprintf(stdout,"norm(e_xd)   [m] = %g\n",e_xd);
-        fprintf(stdout,"norm(e_xdhat)[m] = %g\n",e_xdhat);
-        fprintf(stdout,"norm(e_o) [rad] = %g\n",e_o);
-        fprintf(stdout,"---------\n\n");
-
-        t1=t;
-    }
-    }*/
 
 void handProfilerThread::printStatus() {
     Vector x,o,xdhat,odhat,qdhat;
@@ -1357,4 +1309,13 @@ void handProfilerThread::printStatus() {
 }
 
 void handProfilerThread::onStop() {
+}
+
+void handProfilerThread::clearGui() {
+  Bottle& obj = guiPort.prepare();
+  obj.clear();
+
+  obj.addString("reset");
+
+  guiPort.writeStrict();
 }
