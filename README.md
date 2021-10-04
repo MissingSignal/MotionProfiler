@@ -5,12 +5,12 @@ The trajectory is set by the user and is described as an ellipse:\
 
 <div align="center">
   <img src=".github/Ellisse.png" width="600" >
-</div>
 
 
 |    **O**     |      **A**    |   **B** | **θ<sub>a</sub>** | **θ<sub>b</sub>** |
 |:--------:|:-----------:|:-------------:|:----------:|:----------:|
-| *center*    | *vertex*  |  *co-vertex*  | *starting angle* | *final angle* |
+| *center*    | *vertex*  |  *co-vertex*  | *starting angle (rad)* | *final angle (rad)* |
+</div>
 
 ## Parameters:
 - **--name**           : changes the rootname of the module ports
