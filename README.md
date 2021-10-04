@@ -1,11 +1,16 @@
 # Motion Profiler 2.0
 
 This module allows to control the velocity of icub's end-effector. \
-The trajectory is set by the user and is described as an ellipse:
+The trajectory is set by the user and is described as an ellipse:\
 
 <div align="center">
   <img src=".github/Ellisse.png" width="600" >
 </div>
+
+
+|    **O**     |      **A**    |   **B** | **θ<sub>a</sub>** | **θ<sub>b</sub>** |
+|:--------:|:-----------:|:-------------:|:----------:|:----------:|
+| *center*    | *vertex*  |  *co-vertex*  | *starting angle* | *final angle* |
 
 ## Parameters:
 - **--name**           : changes the rootname of the module ports
@@ -35,7 +40,7 @@ GEN MJP (((O -0.3 -0.1 0.1) (A -0.3 -0.0 0.1) (B -0.3 -0.1 0.2) (C -0.3 -0.1 0.0
 **General velocity profile:** \
 Custom velocity profile read from file
 ```
-GEN GVP((O -0.3 -0.0 0.1) (A -0.3 0.1 0.1) (B -0.3 -0.0 0.2) (C -0.3 -0.0 0.0) (theta 0.0 1.57 4.71) (axes 0.1 0.1) (rev) (param 0.1)))
+GEN GVP ((O -0.3 -0.0 0.1) (A -0.3 0.1 0.1) (B -0.3 -0.0 0.2) (C -0.3 -0.0 0.0) (theta 0.0 1.57 4.71) (axes 0.1 0.1) (rev) (param 0.1)))
 ```
 
 **NON two-third power law profile:**
