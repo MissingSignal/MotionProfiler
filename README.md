@@ -1,10 +1,10 @@
-# MotionProfiler 2.0
+# Motion Profiler 2.0
 
 This module allows to control the velocity of icub's end-effector. \
-The trajectory is set by the user and is described as an ellipsoid:
+The trajectory is set by the user and is described as an ellipse:
 
 <div align="center">
-  <img src=".github/ellipse.png" width="600" >
+  <img src=".github/Ellisse.png" width="600" >
 </div>
 
 ## Parameters:
@@ -12,9 +12,9 @@ The trajectory is set by the user and is described as an ellipsoid:
 - **--robot**          : changes the name of the robot where the module interfaces to
 - **--name**           : rootname for all the connection of the module
 - **--part**           : selected arm
-- **--pitchDof**       : 0/1 disable/enable the DoF
-- **--yawDof**         : 0/1 disable/enable the DoF
-- **--rollDof**        : 0/1 disable/enable the DoF
+- **--pitchDof**       : 0/1 disable/enable the torso DoF
+- **--yawDof**         : 0/1 disable/enable the torso DoF
+- **--rollDof**        : 0/1 disable/enable the torso DoF
 - **--gazeTracking**   : enable gaze tracking
 - **--help**           : get help from terminal
 
@@ -54,7 +54,7 @@ GEN TTL (((O -0.3 -0.1 0.1) (A -0.3 -0.0 0.1) (B -0.3 -0.1 0.3) (C -0.3 -0.1 0.0
 - ```STAR EXE```: start execution  (green trajectory in iCubGUI)
 - ```STAR RES```: start resetting of the posture
 - ```SIM CLR```: simulator cleaning
-- ```STAR FILE SPEE #value```: start execution from file with speed multiplied for the value, if omitted default value is 1.0
+- ```STAR FILE SPEE #value```: start execution from file with speed multiplied for the value, default value is 1.0
 - ```SAVE JOI```: save joints positions in file
 - ```MARK START/STOP```: start/stop time interval
 - ```SYNC```: set time interval decided with MARK START/STOP
