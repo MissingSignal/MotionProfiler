@@ -1,7 +1,7 @@
 # MotionProfiler 2.0
 
 This module allows to control the velocity of icub's end-effector. \
-The trajectory is set by the user and is described as an ellipsoid:
+The trajectory is set by the user and is described as an ellipse:
 
 <div align="center">
   <img src=".github/Ellisse.png" width="600" >
