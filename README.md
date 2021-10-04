@@ -1,4 +1,4 @@
-# MotionProfiler 2.0
+# Motion Profiler 2.0
 
 This module allows to control the velocity of icub's end-effector. \
 The trajectory is set by the user and is described as an ellipse:
@@ -12,9 +12,9 @@ The trajectory is set by the user and is described as an ellipse:
 - **--robot**          : changes the name of the robot where the module interfaces to
 - **--name**           : rootname for all the connection of the module
 - **--part**           : selected arm
-- **--pitchDof**       : 0/1 disable/enable the DoF
-- **--yawDof**         : 0/1 disable/enable the DoF
-- **--rollDof**        : 0/1 disable/enable the DoF
+- **--pitchDof**       : 0/1 disable/enable the torso DoF
+- **--yawDof**         : 0/1 disable/enable the torso DoF
+- **--rollDof**        : 0/1 disable/enable the torso DoF
 - **--gazeTracking**   : enable gaze tracking
 - **--help**           : get help from terminal
 
