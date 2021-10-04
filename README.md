@@ -54,7 +54,7 @@ GEN TTL (((O -0.3 -0.1 0.1) (A -0.3 -0.0 0.1) (B -0.3 -0.1 0.3) (C -0.3 -0.1 0.0
 - ```STAR EXE```: start execution  (green trajectory in iCubGUI)
 - ```STAR RES```: start resetting of the posture
 - ```SIM CLR```: simulator cleaning
-- ```STAR FILE SPEE #value```: start execution from file with speed multiplied for the value, if omitted default value is 1.0
+- ```STAR FILE SPEE #value```: start execution from file with speed multiplied for the value, default value is 1.0
 - ```SAVE JOI```: save joints positions in file
 - ```MARK START/STOP```: start/stop time interval
 - ```SYNC```: set time interval decided with MARK START/STOP
