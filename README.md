@@ -1,4 +1,7 @@
 # Motion Profiler 2.0
+<div align="center">
+  <img src=".github/Changelog.png" >
+</div>
 
 This module allows to control the velocity of icub's end-effector. </br>
 The trajectory is set by the user and is described as an ellipse:
@@ -53,7 +56,7 @@ GEN TTPL (((O -0.3 -0.1 0.1) (A -0.3 -0.0 0.1) (B -0.3 -0.1 0.3) (C -0.3 -0.1 0.
 GEN TTL (((O -0.3 -0.1 0.1) (A -0.3 -0.0 0.1) (B -0.3 -0.1 0.3) (C -0.3 -0.1 0.0) (theta 0.0 1.57 4.71) (axes 0.1 0.2) (rev) (param 0.01 0.33)))
 ```
 
-## Other Useful commands: 
+## Other Useful commands:
 - ```PALM CUS``` : to change the orientation of the palm *e.g. PALM CUS (-0.076 -0.974 0.213 3.03)*
 - ```STAR SIM```: start simulation (yellow trajectory in iCubGUI)
 - ```STAR EXE```: start execution  (green trajectory in iCubGUI)
