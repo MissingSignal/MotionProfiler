@@ -237,7 +237,7 @@ Vector MotionProfile::getInitial() {
 bool MotionProfile::inRange(double theta) {
     //reverseGain = 1 when reverse = FALSE
     if(reverse == 1) {
-        if((theta > thetaA) && (theta< thetaC))
+        if((theta > thetaA) && (theta < thetaC))
             return true;
         else
             return false;
