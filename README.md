@@ -43,7 +43,7 @@ GEN MJP (((O -0.3 -0.1 0.1) (A -0.3 -0.0 0.1) (B -0.3 -0.1 0.2) (C -0.3 -0.1 0.0
 **General velocity profile:** \
 Custom velocity profile read from file
 ```
-GEN GVP ((O -0.3 -0.0 0.1) (A -0.3 0.1 0.1) (B -0.3 -0.0 0.2) (C -0.3 -0.0 0.0) (theta 0.0 1.57 4.71) (axes 0.1 0.1) (rev) (param 0.1)))
+GEN GVP (((O -0.3 -0.0 0.1) (A -0.3 0.1 0.1) (B -0.3 -0.0 0.2) (C -0.3 -0.0 0.0) (theta 0.0 1.57 4.71) (axes 0.1 0.1) (rev) (param 0.1)))
 ```
 
 **NON two-third power law profile:**
