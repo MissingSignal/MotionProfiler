@@ -62,14 +62,14 @@ protected:
     yarp::sig::Vector B;               // vector representating the final desired position for the hand
     yarp::sig::Vector C;               // vector representating the check point of the hand
     yarp::sig::Vector AO;              // vector from A to center of the ellipse
-    yarp::sig::Vector AOnorm;          // vector from A to center of the ellipse
+    yarp::sig::Vector AOnorm;          // normalized vector from A to center of the ellipse
     yarp::sig::Vector BO;              // vector from B to center of the ellipse
-    yarp::sig::Vector BOnorm;          // vector from B to center of the ellipse
+    yarp::sig::Vector BOnorm;          // normalized vector from B to center of the ellipse
     yarp::sig::Vector od;              // vector representing the desired orientation of the hand
     yarp::sig::Vector xPrev;           // vector representing the position at the previous step
     yarp::sig::Vector* xd;             // vector representing the desired position of the hand
     yarp::sig::Vector* xprev;          // vector position of the previous step
-    yarp::sig::Vector* xder1;      // vector position of the previous step
+    yarp::sig::Vector* xder1;          // vector position of the previous step
 
     std::string type;                  // vocab representing the type
 
@@ -84,9 +84,9 @@ protected:
     double radius;                     // radius of the ellipse function of the angle theta, a, b;
     double r,r2,r3;                    // computation variables
     double radiusPrev;                 // radius at the previous incremental step
-    double thetaA;                     // angular position of the point A
-    double thetaB;                     // angular position of the point B
-    double thetaC;                     // angular position of the point C
+    double theta_start;                // angular position of the point A
+    //double thetaB;                   // angular position of the point B (useless)
+    double theta_stop;                 // angular position of the point C
     double angVelocity;                // angular velocity in rad/s
     double theta;                      // angle in rad
     double thetaPrev;                  // previous angle in rad
@@ -151,7 +151,7 @@ public:
     * @param thetaB angle of the viapoint (in rad)
     * @param thataC angle of the stop point (in rad)
     */
-    void setStartStop(const double thetaA, const double thetaB, const double thetaC);
+    void setStartStop(const double theta_start, const double theta_stop);
 
     /**
     * function to set the three via points in 3D space
@@ -281,9 +281,6 @@ public:
 */
 class CVMotionProfile : public MotionProfile {
 protected:
-
-    //double velocity;          // desired tangential velocity
-
 public:
     CVMotionProfile();
     ~CVMotionProfile();
@@ -340,8 +337,8 @@ public:
 */
 class GVPMotionProfile : public MotionProfile {
 protected:
-
-    //double velocity;          // desired tangential velocity
+		int step_counter;     // vector defining the generic velocity profile used in GVP mode
+		yarp::sig::Vector velocityProfile;
 
 public:
     GVPMotionProfile();
@@ -356,7 +353,7 @@ public:
     /**
     * function that sets the desired tangential velocity of the endEffector
     */
-    void setVelocity(const double vel) {tanVelocity = vel;};
+    void setVelocity(yarp::sig::Vector vel) {velocityProfile = vel;};
     void preComputation(const double t, const double theta);
     yarp::sig::Vector* compute(double t);
 };

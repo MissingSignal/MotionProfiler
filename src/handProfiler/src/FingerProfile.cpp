@@ -34,14 +34,14 @@ using namespace fingerFactory;
 
 FingerProfile::FingerProfile()  {
 
-    
+
     //////////Fabio open port for data gathering
     //string velName("");`
     //velName.append(getName("/vel:o"));
     if(!dataPort.open("/FingerProfile/data:o")) {
           yError("dataPort is not open with success. Check for conflicts");
     }
-    
+
     graspHome.resize(9);
     graspVia.resize(9);
     graspFinal.resize(9);
@@ -92,7 +92,7 @@ FingerProfile::FingerProfile()  {
     graspFinal[6] = 55.0;
     graspFinal[7] = 165.0;
     graspFinal[8] = 232.0;
-    
+
     //BIG
     /*graspHome[0] = 40.0;
     graspHome[1] = 40.0;
@@ -121,18 +121,17 @@ FingerProfile::FingerProfile()  {
     graspFinal[6] = 20.0;
     graspFinal[7] = 10.0;
     graspFinal[8] = 100.0;*/
-    
+
 }
 
 FingerProfile::~FingerProfile() {
 
 }
 
-
 //*********************************************************************************************
 
 CVFingerProfile::CVFingerProfile(){
-    
+
 }
 
 CVFingerProfile::~CVFingerProfile(){
@@ -140,7 +139,7 @@ CVFingerProfile::~CVFingerProfile(){
 }
 
 Vector* CVFingerProfile::compute(Vector target, double t) {
-  
+
     nextPosition = new Vector(9);
 
     if(target[15]<graspFinal[8]){
@@ -152,7 +151,6 @@ Vector* CVFingerProfile::compute(Vector target, double t) {
     }
     return nextPosition;
 }
-
 
 //*********************************************************************************************
 
@@ -166,12 +164,12 @@ CVVFingerProfile::~CVVFingerProfile(){
 }
 
 Vector* CVVFingerProfile::compute(Vector target, double t) {
-    
+
     nextPosition = new Vector(9);
     //nextPosition->clear(); // check if this is necessary
     double speed2Via   = 300;
     double speed2Final = 300;
-    graspHomeTime = 0.01; 
+    graspHomeTime = 0.01;
     graspViaTime = 0.3;
     graspFinalTime = 0.6;
 
@@ -208,6 +206,6 @@ Vector* CVVFingerProfile::compute(Vector target, double t) {
         }
         //yError("fase 4 %f ", t);
     }
-    
+
     return nextPosition;
 }

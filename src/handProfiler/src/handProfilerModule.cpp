@@ -192,7 +192,6 @@ bool handProfilerModule::configure(yarp::os::ResourceFinder &rf) {
         configFile.clear();
     }
 
-
     /* create the thread and pass pointers to the module parameters */
     rThread = new handProfilerThread(robotName, configFile, rf);
     rThread->setName(getName().c_str());
@@ -855,8 +854,8 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                     rec = true;
                     reply.addString("genVel");
                     if(0!=rThread){
-                        Bottle* finalB = command.get(2).asList();
-                        if(rThread->factory("GVP",*finalB)) {
+                        Bottle* params = command.get(2).asList();
+                        if(rThread->factory("GVP",*params)) {
                             yInfo("factory:genVel");
                             ok = true;
                         }
