@@ -1572,27 +1572,24 @@ GVPMotionProfile::GVPMotionProfile(const Bottle& bInit) {
     argv[0] = (char*) stringArray[0].c_str();
     //yDebug("added first %s", argv[0]);
 
-    // parser da rivedere se si volgliono passare profili di velocità lunghi
-    for (int j = 0; j < b->size(); j++) {
+    for (int j = 0; j < b->size(); j++) { //j iterates over the parameters
         Bottle* vector = b->get(j).asList();
-        stringArray[j * 2 + 1].append("--");
-        //stringArray[j * 2 + 1].append("A");
-        stringArray[j * 2 + 1].append(vector->get(0).asString().c_str());
-        char temp[50];
-        sprintf(temp,"%f %f %f", vector->get(1).asFloat64(), vector->get(2).asFloat64(), vector->get(3).asFloat64());
-        yDebug("stringArray %s", stringArray[j * 2 + 1].c_str());
-        stringArray[j * 2 + 2].append(&temp[0]);
+        stringArray[j * 2 + 1].append("--"); // put -- prefix
+        stringArray[j * 2 + 1].append(vector->get(0).asString().c_str()); // put name of the resource (e.g. A,O,...)
+        stringArray[j * 2 + 2].append(vector->tail().toString().c_str()); // put the remaining values
+
         argv[j * 2 + 1] = (char*) stringArray[j * 2 + 1].c_str();
         argv[j * 2 + 2] = (char*) stringArray[j * 2 + 2].c_str();
-        //yDebug("param %d %s", j, argv[j * 2 + 1]);
-        //yDebug("value %s", argv[j * 2 + 2]);
+
+        yInfo("got velocity profile with %zu points", vector->size());
     }
+
     yDebug("parsing ");
-    yDebug("%s",argv[0] );
+    //yDebug("%s",argv[0] ); @LUCA
     yDebug("%s, %s",argv[1], argv[2] );
     // configuring the resource finder
     rf.configure(b->size() * 2 + 1, argv);
-    yInfo("resorceFinder: %s",rf.toString().c_str());
+    yInfo("resourceFinder: %s",rf.toString().c_str());
     // visiting the parameters using the RF
     Vector Ovector(3);
     Vector Avector(3);
@@ -1619,7 +1616,7 @@ GVPMotionProfile::GVPMotionProfile(const Bottle& bInit) {
     axisVector[0] = eval_distance(Avector,Ovector); //AO Axis
     axisVector[1] = eval_distance(Bvector,Ovector); //BO Axis
 
-    string Cstring = rf.check("C", //@Deleted by Luca
+    string Cstring = rf.check("C",
                            Value("-0.3 -0.2 0.1"),
                            "position C (string)").asString();
     extractVector(Cstring, Cvector);
@@ -1629,18 +1626,20 @@ GVPMotionProfile::GVPMotionProfile(const Bottle& bInit) {
                            Value("0 6.28"),
                            "theta angles (string)").asString();
     extractVector(thetaString, thetaVector);
-    yDebug("got theta angles (rad) :(%s)", thetaVector.toString().c_str());
+    yDebug("got theta angles (rad):(%s)", thetaVector.toString().c_str());
 
     // here we read the velocity profile passed as sequence of values
-    Vector velVector(3);
+    Vector velVector(); //da modificare @Luca
+
     string  velString = rf.check("vel",
                            Value("0.1 0.1 0.1"),
                            "velocity profile (string)").asString();
     extractVector(velString, velVector);
-    yInfo("got velocity profile:(%s)", velVector.toString().c_str());
+
+    yDebug("got velocity profile:(%s)", velVector.toString().c_str());
 
     bool reverse = rf.check("rev");
-    reverse? yDebug("reverse is ON") : yDebug("reverse is ON");
+    reverse? yDebug("reverse is ON") : yDebug("reverse is OFF");
 
     // IS THIS USEFUL ? WE HAVE ALREADY READ OUR PARAMETERS @Luca
     // if(b->size() == 6){removed}
@@ -1678,15 +1677,16 @@ void GVPMotionProfile::preComputation(const double t, const double theta) {
     //--------------------------------------------------------------------------
     //IMPONGO LA VELOCITA TANGENZIALE E RICAVO LA VELOCITA ANGOLARE DA IMPORRE
     // the formula is Tan_vel = r *ang_vel
+
+    //iteratively impose the velocity
     tanVelocity = velocityProfile[step_counter];
+
+    if (step_counter < velocityProfile.size()) {
+      step_counter = step_counter++;
+    }
 
     //yInfo("VELOCITY PROFILE %s", velocityProfile.toString().c_str()); @Luca
     yInfo("DESIRED TANGENTIAL VELOCITY  %f IN m/s", tanVelocity);
-
-    if (step_counter<2) {
-      step_counter = step_counter + 1;
-    }
-
 
     angVelocity = tanVelocity / radius;
     //--------------------------------------------------------------------------
