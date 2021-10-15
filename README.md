@@ -32,12 +32,12 @@ It is possible to generate different motion profiles
 
 **Generate constant velocity profile:**
 ```
-GEN CVP (((O -0.3 -0.1 0.1) (A -0.3 -0.0 0.1) (B -0.3 -0.1 0.2) (theta 0.0 1.57 4.71) (axes 0.1 0.1) (param 0.1)))
+GEN CVP (((O -0.3 -0.1 0.1) (A -0.3 -0.0 0.1) (B -0.3 -0.1 0.2) (theta 0.0 1.57) (param 0.1)))
 ```
 
 **Minimum jerk profile:**
 ```
-GEN MJP (((O -0.3 -0.1 0.1) (A -0.3 -0.0 0.1) (B -0.3 -0.1 0.2) (theta 0.0 1.57 4.71) (axes 0.1 0.1) (param 1.57 3.0)))
+GEN MJP (((O -0.3 -0.1 0.1) (A -0.3 -0.0 0.1) (B -0.3 -0.1 0.2) (theta 0.0 1.57) (param 1.57 3.0)))
 ```
 
 **General velocity profile:** \
@@ -48,12 +48,12 @@ GEN GVP (((O -0.3 0.1 0.1) (A -0.3 0.2 0.1) (B -0.3 0.1 0.2) (theta 0.0 3.14) (v
 
 **NON two-third power law profile:**
 ```
-GEN TTPL (((O -0.3 -0.1 0.1) (A -0.3 -0.0 0.1) (B -0.3 -0.1 0.3) (theta 0.0 1.57 4.71) (axes 0.1 0.2) (param 0.1 0.33)))
+GEN TTPL (((O -0.3 -0.1 0.1) (A -0.3 -0.0 0.1) (B -0.3 -0.1 0.3) (theta 0.0 1.57) (param 0.1 0.33)))
 ```
 
 **Two-third power law profile:**
 ```
-GEN TTL (((O -0.3 -0.1 0.1) (A -0.3 -0.0 0.1) (B -0.3 -0.1 0.3) (theta 0.0 1.57 4.71) (axes 0.1 0.2) (param 0.01 0.33)))
+GEN TTL (((O -0.3 -0.1 0.1) (A -0.3 -0.0 0.1) (B -0.3 -0.1 0.3) (theta 0.0 1.57) (param 0.01 0.33)))
 ```
 
 ## Other Useful commands:
