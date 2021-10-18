@@ -264,7 +264,7 @@ bool handProfilerThread::threadInit() {
         icart->registerEvent(*this);
     }
 
-      /* set the position controller for movement from file */
+    /* set the position controller for movement from file */
     Property optionJoints;
     optionJoints.put("device", "remote_controlboard");
     optionJoints.put("local", "/handProfiler/joints");                 //local port names
@@ -487,26 +487,26 @@ std::string handProfilerThread::getName(const char* p) {
 }
 
 void  handProfilerThread::rotAxisX(const double& angle) {
-    Vector Anew, Bnew, Cnew;
+    Vector Anew, Bnew, Cnew, Dnew;
     Anew = mp->getA();
     Bnew = mp->getB();
     Cnew = mp->getC();
-
+    Dnew = mp->getD();
     // multiplying the vector by the matrix
     mp->setA(Anew);
     mp->setB(Bnew);
     mp->setC(Cnew);
+    mp->setD(Dnew);
     mp->setViaPoints(Anew, Bnew);
 }
 
-// Rimuovere ? @LUCA
+// Non mi sembra implementato, da rimuovere ? @LUCA
 void  handProfilerThread::rotAxisY(const double& angle) {
     Vector Anew, Bnew, Cnew, Dnew;
     Anew = mp->getA();
     Bnew = mp->getB();
     Cnew = mp->getC();
     Dnew = mp->getD();
-
     mp->setA(Anew);
     mp->setB(Bnew);
     mp->setC(Cnew);
@@ -514,13 +514,15 @@ void  handProfilerThread::rotAxisY(const double& angle) {
 }
 
 void  handProfilerThread::rotAxisZ(const double& angle) {
-    Vector Anew, Bnew, Cnew;
+    Vector Anew, Bnew, Cnew, Dnew;
     Anew = mp->getA();
     Bnew = mp->getB();
     Cnew = mp->getC();
+    Dnew = mp->getD();
     mp->setA(Anew);
     mp->setB(Bnew);
     mp->setC(Cnew);
+    mp->setD(Dnew);
 }
 
 void handProfilerThread::setInputPortName(string InpPort) {
@@ -717,6 +719,7 @@ void handProfilerThread::run() {
             t = t0;
             mp->setT0(t0);
             firstIteration = false;
+            // show O,A,B,C,D in the iCubGUI
             displayProfile();
 
             //-----file opening to save -------
@@ -741,28 +744,20 @@ void handProfilerThread::run() {
         switch (state) {
             case execution:
                 success = generateTarget();
-                //yDebug("generated target %d", success);
+
                 if(success){
-                    icart-> goToPose(xd,od);
+                    //go to next position
+                    icart->goToPose(xd,od);
                     if(graspOn){
                         const int graspJoints[] = {7,8,9,10,11,12,13,14,15};
                         idir->setPositions(graspNumber, graspJoints, fd.data());
-                        //idir->setPosition(11, fd[4]);
-                        //idir->setPosition(12, fd[5]);
-                        //idir->setPosition(13, fd[6]);
-                        //idir->setPosition(14, fd[7]);
-
-                        // double trajTime;
-                        // icart->getTrajTime(&trajTime);
-                        // yDebug("trajTime %f", trajTime);
                     }
                     if(saveOn) {
                         saveToArray();
                     }
-
                     if(gazetracking && (count%GAZEINTERVAL==0)) {
-                        igaze->lookAtFixationPoint(xd);
-                    }
+                        // set starting gaze pose
+                        igaze->lookAtFixationPoint(xd);}
                 }else if(!success && outputFile.is_open() && saveOn){
                     yInfo("file saved");
                     yDebug("cicli: %d ", infoSamples);
@@ -803,7 +798,7 @@ void handProfilerThread::run() {
                 break;
         }
 
-
+        // show points on the trajectory, yellow = simulated , green = attained
         displayTarget();
         if(xdPort.getOutputCount()) {
             printXd();
@@ -818,8 +813,8 @@ void handProfilerThread::run() {
         }
 
         double tend = Time::now();
-        double diff = (tend-t) * 1000;
-        //yInfo("diff=%f [ms]", diff);
+        double execTime = (tend-t) * 1000;
+        yInfo("diff=%f [s]", execTime);
 
 
     }
@@ -1239,7 +1234,7 @@ void handProfilerThread::displayProfile() {
     }
 }
 
-void handProfilerThread::displayTarget() {
+void handProfilerThread::displayTarget(){
     int r, g, b;
     if(state == simulation) {
         r =255; g =255; b = 0;
@@ -1258,7 +1253,7 @@ void handProfilerThread::displayTarget() {
         string str("");
         sprintf((char*)str.c_str(),"%d",count);
         yInfo("displaying %s", str.c_str());
-        obj.addString(str.c_str()); //Commented by @Luca
+        obj.addString(str.c_str());
         // object dimensions in millimiters
         // (it will be displayed as an ellipsoid with the tag "my_object_name")
         obj.addFloat64(5);
