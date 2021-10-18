@@ -10,7 +10,7 @@ The trajectory is set by the user and is described as an ellipse:
   <img src=".github/Ellisse.png" width="600" >
 
 
-|    **O**     |      **A**    |   **B** | **θ<sub>a</sub>** | **θ<sub>b</sub>** |
+|    **O**     |      **A**    |   **B** | **θ<sub>start</sub>** | **θ<sub>stop</sub>** |
 |:--------:|:-----------:|:-------------:|:----------:|:----------:|
 | *center (m)*    | *vertex (m)*  |  *co-vertex (m)*  | *starting angle (rad)* | *final angle (rad)* |
 </div>

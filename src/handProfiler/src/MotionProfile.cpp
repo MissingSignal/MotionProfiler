@@ -1510,10 +1510,10 @@ void GVPMotionProfile::preComputation(const double t, const double theta){
 
   // Written by @Luca
   //--------------------------------------------------------------------------
-  //IMPONGO LA VELOCITA TANGENZIALE E RICAVO LA VELOCITA ANGOLARE DA IMPORRE
+  //IMPONGO LA VELOCITA TANGENZIALE E RICAVO LA VELOCITA ANGOLARE USATA NELLA FORMULA
   // the formula is Tan_vel = r *ang_vel
 
-  //iteratively impose the velocity
+  // iteratively read the velocity profile and impose the tang. velocity
   tanVelocity = velocityProfile[step_counter];
 
   if (step_counter < velocityProfile.size()) {
