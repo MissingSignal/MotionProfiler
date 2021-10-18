@@ -44,18 +44,18 @@ using namespace fingerFactory;
 
 //******************** factories for fingers ***************************************
 
-FingerProfile* factoryCVFingerProfile(){
+FingerProfile* factoryCVFingerProfile() {
     CVFingerProfile *fingerProfile = new CVFingerProfile();
     return static_cast<FingerProfile*>(fingerProfile);
 }
 
-FingerProfile* factoryCVVFingerProfile(){
+FingerProfile* factoryCVVFingerProfile() {
     CVVFingerProfile *fingerProfile = new CVVFingerProfile();
     return static_cast<FingerProfile*>(fingerProfile);
 }
 
 //********************* factories for motion profiles ***********************************
-MotionProfile* factoryCVMotionProfile(const Bottle &param){
+MotionProfile* factoryCVMotionProfile(const Bottle &param) {
     CVMotionProfile *cvmp = new CVMotionProfile(param);
     if(!cvmp->isValid()){
         yError("factory ERROR");
@@ -67,7 +67,7 @@ MotionProfile* factoryCVMotionProfile(const Bottle &param){
     }
 }
 
-MotionProfile* factoryMJMotionProfile(const Bottle &param){
+MotionProfile* factoryMJMotionProfile(const Bottle &param) {
     MJMotionProfile *mjmp = new MJMotionProfile(param);
     if(!mjmp->isValid()){
         yError("factory ERROR");
@@ -79,7 +79,7 @@ MotionProfile* factoryMJMotionProfile(const Bottle &param){
     }
 }
 
-MotionProfile* factoryGVPMotionProfile(const Bottle &param){
+MotionProfile* factoryGVPMotionProfile(const Bottle &param) {
     GVPMotionProfile *gvmp = new GVPMotionProfile(param);
     if(!gvmp->isValid()){
         yError("factory ERROR");
@@ -91,7 +91,7 @@ MotionProfile* factoryGVPMotionProfile(const Bottle &param){
     }
 }
 
-MotionProfile* factoryTTPLMotionProfile(const Bottle &param){
+MotionProfile* factoryTTPLMotionProfile(const Bottle &param) {
     TTPLMotionProfile *ttplmp = new TTPLMotionProfile(param);
     if(ttplmp==NULL){
         yError("factory ERROR: NULL pointer");
@@ -108,7 +108,7 @@ MotionProfile* factoryTTPLMotionProfile(const Bottle &param){
     }
 }
 
-MotionProfile* factoryTwoThirdMotionProfile(const Bottle &param){
+MotionProfile* factoryTwoThirdMotionProfile(const Bottle &param) {
     TwoThirdMotionProfile *ttplmp = new TwoThirdMotionProfile(param);
     if(ttplmp==NULL){
         yError("factory ERROR: NULL pointer");
@@ -151,7 +151,7 @@ handProfilerThread::handProfilerThread(): RateThread(RATETHREAD) {
 
 }
 
-handProfilerThread::handProfilerThread(string _robot, string _configFile, ResourceFinder rf): RateThread(RATETHREAD){
+handProfilerThread::handProfilerThread(string _robot, string _configFile, ResourceFinder rf): RateThread(RATETHREAD) {
     robot = _robot;
     configFile = _configFile;
     icart = 0;
@@ -496,17 +496,21 @@ void  handProfilerThread::rotAxisX(const double& angle) {
     mp->setA(Anew);
     mp->setB(Bnew);
     mp->setC(Cnew);
-    mp->setViaPoints(Anew, Bnew, Cnew);
+    mp->setViaPoints(Anew, Bnew);
 }
 
+// Rimuovere ? @LUCA
 void  handProfilerThread::rotAxisY(const double& angle) {
-    Vector Anew, Bnew, Cnew;
+    Vector Anew, Bnew, Cnew, Dnew;
     Anew = mp->getA();
     Bnew = mp->getB();
     Cnew = mp->getC();
+    Dnew = mp->getD();
+
     mp->setA(Anew);
     mp->setB(Bnew);
     mp->setC(Cnew);
+    mp->setD(Dnew);
 }
 
 void  handProfilerThread::rotAxisZ(const double& angle) {
@@ -523,7 +527,7 @@ void handProfilerThread::setInputPortName(string InpPort) {
 
 }
 
-bool handProfilerThread::resetExecution(){
+bool handProfilerThread::resetExecution() {
     bool result = true;
     Vector xZero(3);
     xZero[0] = -0.3; xZero[1] = -0.1; xZero[2] = 0.1;
@@ -576,7 +580,7 @@ bool handProfilerThread::resetExecution(){
     return result;
 }
 
-bool handProfilerThread::startExecution(const bool _reverse){
+bool handProfilerThread::startExecution(const bool _reverse) {
     //count = 0;
     //mp->setReverse(_reverse);
     idle = false;
@@ -586,7 +590,7 @@ bool handProfilerThread::startExecution(const bool _reverse){
 	return true;
 }
 
-bool handProfilerThread::startSimulation(const bool _reverse){
+bool handProfilerThread::startSimulation(const bool _reverse) {
     //count = 0;
     //mp->setReverse(_reverse);
     idle = false;
@@ -596,7 +600,7 @@ bool handProfilerThread::startSimulation(const bool _reverse){
 	return true;
 }
 
-bool handProfilerThread::startResetting(){
+bool handProfilerThread::startResetting() {
     //count = 0;
     //mp->setReverse(_reverse);
     idle = true;
@@ -609,7 +613,7 @@ bool handProfilerThread::startResetting(){
 	return ret;
 }
 
-bool handProfilerThread::saveJoints(){                                  //save to file
+bool handProfilerThread::saveJoints() {                                  //save to file
     //count = 0;
     //mp->setReverse(_reverse);
     saveOn = !saveOn;
@@ -619,7 +623,7 @@ bool handProfilerThread::saveJoints(){                                  //save t
 	return true;
 }
 
-bool handProfilerThread::startJoints(double factor = 1.0){              //move from file
+bool handProfilerThread::startJoints(double factor = 1.0) {              //move from file
     //count = 0;
     //mp->setReverse(_reverse);
     idle = false;
@@ -630,7 +634,7 @@ bool handProfilerThread::startJoints(double factor = 1.0){              //move f
 	return true;
 }
 
-bool handProfilerThread::fingerfactory(const string type, const Bottle finalB){
+bool handProfilerThread::fingerfactory(const string type, const Bottle finalB) {
     yDebug("finalB: %s", finalB.toString().c_str());
     if (!strcmp(type.c_str(),"CVV")) {
         fp = factoryCVVFingerProfile();
@@ -649,7 +653,7 @@ bool handProfilerThread::fingerfactory(const string type, const Bottle finalB){
 
 }
 
-bool handProfilerThread::factory(const string type, const Bottle finalB){
+bool handProfilerThread::factory(const string type, const Bottle finalB) {
 
     if (!strcmp(type.c_str(),"CVP")) {
         mp = factoryCVMotionProfile(finalB);
@@ -954,7 +958,7 @@ bool handProfilerThread::generateTarget() {
     return true;
 }
 
-void handProfilerThread::saveToArray(){                         //save to file: read encoders and save values in file with timestamp
+void handProfilerThread::saveToArray() {                         //save to file: read encoders and save values in file with timestamp
     //yDebug("saveToArray");
     Vector tempJoints;
     tempJoints.resize(njoints);
@@ -971,7 +975,7 @@ void handProfilerThread::saveToArray(){                         //save to file: 
     infoSamples++;
 }
 
-void handProfilerThread::saveToFile(){                         //save to file: read encoders and save values in file with timestamp
+void handProfilerThread::saveToFile() {                         //save to file: read encoders and save values in file with timestamp
     //yDebug("saveToFile");
     outputFile.precision(13);
     if (outputFile.is_open()){
@@ -988,7 +992,7 @@ void handProfilerThread::saveToFile(){                         //save to file: r
     jointsToSave.resize(0);
 }
 
-void handProfilerThread::saveInfo(){                                            //save the info in separate file
+void handProfilerThread::saveInfo() {                                            //save the info in separate file
     if (infoOutputFile.is_open()){
         infoOutputFile << Time::now() - firstDuration << " ";                   //duration
         infoOutputFile << infoSamples << " ";                                   //samples number
@@ -1003,7 +1007,7 @@ void handProfilerThread::saveInfo(){                                            
         yError("Unable to open info output file");
 }
 
-void handProfilerThread::startFromFile(){                                       //move from file
+void handProfilerThread::startFromFile() {                                       //move from file
     if (partnerTime != 0.0) {
         speedFactor = movementDuration / partnerTime;                           //if partnerTime is set change speedFactor
         yWarning("start from partner time");
@@ -1034,7 +1038,7 @@ void handProfilerThread::startFromFile(){                                       
     idle = true;
 }
 
-void handProfilerThread::playFromFile(){
+void handProfilerThread::playFromFile() {
     double jointValue = 0.0;
     double playJoints[17];
     double executionTime = 0;
@@ -1189,18 +1193,21 @@ void handProfilerThread::displayProfile() {
 
     if (guiPort.getOutputCount()) {
         // extract important parameters
-        Vector vectorList[4];
+        Vector vectorList[5];
         vectorList[0] = mp->getO();
         vectorList[1] = mp->getA();
         vectorList[2] = mp->getB();
         vectorList[3] = mp->getC();
-        string objectName[4];
+        vectorList[4] = mp->getD();
+
+        string objectName[5];
         objectName[0].append("O");
         objectName[1].append("A");
         objectName[2].append("B");
         objectName[3].append("C");
+        objectName[4].append("D");
 
-        for(int i = 0; i < 4; i++) {
+        for(int i = 0; i < 5; i++) {
             // preparing the bottle
             Bottle& obj = guiPort.prepare();
             obj.clear();

@@ -60,7 +60,9 @@ protected:
     yarp::sig::Vector O;               // vector representating the position of the center ellipse
     yarp::sig::Vector A;               // vector representating the initial position for the hand
     yarp::sig::Vector B;               // vector representating the final desired position for the hand
-    yarp::sig::Vector C;               // vector representating the check point of the hand
+    yarp::sig::Vector C;               // vector representating the point symmetric to A
+		yarp::sig::Vector D;               // vector representating the point symmetric to B
+
     yarp::sig::Vector AO;              // vector from A to center of the ellipse
     yarp::sig::Vector AOnorm;          // normalized vector from A to center of the ellipse
     yarp::sig::Vector BO;              // vector from B to center of the ellipse
@@ -161,7 +163,7 @@ public:
     /**
     * function to set the three via points in 3D space
     */
-    void setViaPoints(const yarp::sig::Vector A,const yarp::sig::Vector B,const yarp::sig::Vector C);
+    void setViaPoints(const yarp::sig::Vector A,const yarp::sig::Vector B);
 
     /**
     * function to se the main axes of the ellipse that belong to the reference plane
@@ -194,14 +196,24 @@ public:
     yarp::sig::Vector getB() { return B; };
 
     /**
-    * function setting the A vector
+    * function setting the C vector
     */
     void setC(yarp::sig::Vector value) { C = value; };
+
+		/**
+		* function setting the D vector
+		*/
+		void setD(yarp::sig::Vector value) { D = value; };
 
     /**
     * function returning the C vector
     */
     yarp::sig::Vector getC() { return C; };
+
+		/**
+		* function returning the D vector
+		*/
+		yarp::sig::Vector getD() { return D; };
 
     /**
      * function that returs the initial position of the traj.
@@ -255,7 +267,7 @@ public:
     /**
     * function that checks if all the points belong to the reaching space
     */
-    bool sanityCheck(const yarp::sig::Vector array[], const int size);
+    bool pointsAreReachable();
 
     /**
      * function that return whether the theta angle is in the execution range
