@@ -863,18 +863,17 @@ TwoThirdMotionProfile::TwoThirdMotionProfile(const Bottle& bInit){
                            "position B (string)").asString();
     extractVector(Bstring, Bvector);
     yDebug("got B value %s", Bvector.toString().c_str());
+    // TO DO: Si puo ripulire, calcoliamolo in setAxes @LUCA
+    Vector axisVector(2);
+    axisVector[0] = eval_distance(Avector,Ovector); //AO Axis
+    axisVector[1] = eval_distance(Bvector,Ovector); //BO Axis
+
     Vector thetaVector(2);
     string  thetaString = rf.check("theta",
-                           Value("0 1.57"),
+                           Value("0 6.28"),
                            "theta angles (string)").asString();
     extractVector(thetaString, thetaVector);
-    yDebug("got theta angles:(%s)", thetaVector.toString().c_str());
-    Vector axisVector(2);
-    string  axisString = rf.check("axes",
-                           Value("0.1 0.2"),
-                           "minor and major axes (string)").asString();
-    extractVector(axisString, axisVector);
-    yDebug("got minor and major axes:(%s)", axisVector.toString().c_str());
+    yDebug("got angles (rad): theta_start: %f theta_stop: %f", thetaVector[0], thetaVector[1]);
     Vector paramVector(1);
     string  paramString = rf.check("param",
                            Value("0.1"),
@@ -1210,18 +1209,17 @@ MJMotionProfile::MJMotionProfile(const Bottle& bInit){
                          "position B (string)").asString();
   extractVector(Bstring, Bvector);
   yDebug("got B value %s", Bvector.toString().c_str());
+  // TO DO: Si puo ripulire, calcoliamolo in setAxes @LUCA
+  Vector axisVector(2);
+  axisVector[0] = eval_distance(Avector,Ovector); //AO Axis
+  axisVector[1] = eval_distance(Bvector,Ovector); //BO Axis
+
   Vector thetaVector(2);
   string  thetaString = rf.check("theta",
-                         Value("0 1.57"),
+                         Value("0 6.28"),
                          "theta angles (string)").asString();
   extractVector(thetaString, thetaVector);
-  yDebug("got theta angles:(%s)", thetaVector.toString().c_str());
-  Vector axisVector(2);
-  string  axisString = rf.check("axes",
-                         Value("0.1 0.2"),
-                         "minor and major axes (string)").asString();
-  extractVector(axisString, axisVector);
-  yDebug("got minor and major axes:(%s)", axisVector.toString().c_str());
+  yDebug("got angles (rad): theta_start: %f theta_stop: %f", thetaVector[0], thetaVector[1]);
   Vector paramVector(1);
   string  paramString = rf.check("param",
                          Value("0.1"),
@@ -1459,8 +1457,7 @@ GVPMotionProfile::GVPMotionProfile(const Bottle& bInit) {
                          Value("0 6.28"),
                          "theta angles (string)").asString();
   extractVector(thetaString, thetaVector);
-  yDebug("got theta angles (rad):(%s)", thetaVector.toString().c_str());
-
+  yDebug("got angles (rad): theta_start: %f theta_stop: %f", thetaVector[0], thetaVector[1]);
   // here we read the velocity profile passed as sequence of values
   string  velString = rf.check("vel",
                          Value("0.1 0.1 0.1"),
