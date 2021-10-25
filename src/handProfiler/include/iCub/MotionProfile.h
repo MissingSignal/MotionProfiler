@@ -104,7 +104,7 @@ protected:
 
     bool firstCompute;                 //
     bool valid;                        // flag indicating whether the motionProfile is valid class
-    int reverse;                       // flag indicating if the action is performed reverse
+    int reverseSign;                   // integer indicating if the action is performed forward or backward(reverse flag=1)
 
     yarp::os::BufferedPort<yarp::os::Bottle>  dataPort;
 
@@ -127,6 +127,11 @@ public:
      */
     ~MotionProfile();
 
+		/**
+		 * read arguments and initialize the variables of the motion profile
+		 */
+		yarp::sig::Vector InitializeParameters(const yarp::os::Bottle *b);
+
     /**
     * checks whether the parameters are valid
     */
@@ -145,7 +150,7 @@ public:
     /**
      * function that sets the flag reverse in the class
      */
-    void setReverse(const bool _reverse) {_reverse?reverse = -1 : reverse = 1; };
+    void setReverse(const bool _reverse) {_reverse? reverseSign = -1 : reverseSign = 1; };
 
     /**
     * function that sets where the action should start and stop
@@ -261,8 +266,6 @@ public:
     * @return radius of the ellipse/circle at a given angle theta
     */
     virtual double computeRadius(const double theta);
-
-
 
     /**
     * function that checks if all the points belong to the reaching space

@@ -802,37 +802,13 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                     rec = true;
                     reply.addString("constant");
                     if(0!=rThread){
-                        /*Bottle b;
-                        Bottle bA;
-                        bA.addDouble(-0.3);bA.addDouble(0.0);bA.addDouble(0.1);
-                        b.addList() = bA;
-                        Bottle bB;
-                        bB.addDouble(-0.3);bB.addDouble(-0.1);bB.addDouble(0.2);
-                        b.addList() = bB;
-                        Bottle bC;
-                        bC.addDouble(-0.3);bC.addDouble(-0.1);bC.addDouble(0.0);
-                        b.addList() = bC;
-                        Bottle bAngles;
-                        bAngles.addDouble(0.0);bAngles.addDouble(1.5708);bAngles.addDouble(4.7128);
-                        b.addList() = bAngles;
-                        Bottle bParam;
-                        bParam.addDouble(0.1);bParam.addDouble(0.1);;
-                        b.addList() = bParam;
-                        Bottle finalB;
-                        finalB.addList() = b;
-                        */
-
-                        //GEN CVP (((-0.3 -0.0 0.1) (-0.3 -0.1 0.2) (-0.3 -0.1 0.0) (0.0 1.57 4.71) (0.1 0.1)))
-
                         if(command.size() == 3) {
-                            Bottle* finalB = command.get(2).asList();
-                            yDebug("bottle in threadInit %s", finalB->toString().c_str());
-                            if(rThread->factory("CVP", *finalB)) {
-                                yInfo("factory:constant");
-                                //reply.addString("OK");
-                                ok = true;
-                            }
-                        }
+                          Bottle* finalB = command.get(2).asList();
+                          yDebug("bottle in threadInit %s", finalB->toString().c_str());
+                          if(rThread->factory("CVP", *finalB)) {
+                              ok = true;
+                          }
+                          }
                     }
                 }
             break;
@@ -843,7 +819,6 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                     if(0!=rThread){
                         Bottle* finalB = command.get(2).asList();
                         if(rThread->factory("MJP",*finalB)) {
-                            yInfo("factory:minJerk");
                             ok = true;
                         }
                     }
@@ -856,8 +831,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                     if(0!=rThread){
                         Bottle* params = command.get(2).asList();
                         if(rThread->factory("GVP",*params)) {
-                            yInfo("factory:genVel");
-                            ok = true;
+                          ok = true;
                         }
                     }
                 }
@@ -872,7 +846,6 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                             Bottle* finalB = command.get(2).asList();
                             yDebug("bottle in threadInit %s", finalB->toString().c_str());
                             if(rThread->factory("TTPL", *finalB)) {
-                                yInfo("factory:ttpl");
                                 ok = true;
                             }
                         }
@@ -889,7 +862,6 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                             Bottle* finalB = command.get(2).asList();
                             yDebug("bottle in threadInit %s", finalB->toString().c_str());
                             if(rThread->factory("TwoThird", *finalB)) {
-                                yInfo("factory:tt");
                                 ok = true;
                             }
                         }

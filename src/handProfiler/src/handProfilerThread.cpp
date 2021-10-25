@@ -658,49 +658,47 @@ bool handProfilerThread::fingerfactory(const string type, const Bottle finalB) {
 bool handProfilerThread::factory(const string type, const Bottle finalB) {
 
     if (!strcmp(type.c_str(),"CVP")) {
+        yInfo("Velocity profile: CONSTANT VELOCITY PROFILE");
         mp = factoryCVMotionProfile(finalB);
-        yDebug("returned from CVP factory");
         if (mp == NULL){
             yError("factory returned error");
             return false;
         }
     }
     else if(!strcmp(type.c_str(),"TTPL")) {
+        yInfo("Velocity profile: FAKE(?) TWO THIRD POWER LAW");
         mp = factoryTTPLMotionProfile(finalB);
-        yDebug("returned from TTPL factory");
         if (mp == NULL){
             yError("factory returned error");
             return false;
         }
     }
-    else if(!strcmp(type.c_str(),"TwoThird")) {
+    else if(!strcmp(type.c_str(),"TwoThird")){
+        yInfo("Velocity profile: TWO THIRD POWER LAW");
         mp = factoryTwoThirdMotionProfile(finalB);
-        yDebug("returned from TwoThird factory");
         if (mp == NULL){
             yError("factory returned error");
             return false;
         }
     }
-    else if(!strcmp(type.c_str(),"MJP")) {
-        yDebug("Entering in factory")  ;
+    else if(!strcmp(type.c_str(),"MJP")){
+        yInfo("Velocity profile: MINIMUM JERK");
         mp = factoryMJMotionProfile(finalB);
-        yDebug("returned from MJP factory");
         if (mp == NULL){
             yError("factory returned error");
             return false;
         }
     }
-    else if(!strcmp(type.c_str(),"GVP")) {
-        yDebug("Entering in factory")  ;
+    else if(!strcmp(type.c_str(),"GVP")){
+        yInfo("Velocity profile: GENERIC VELOCITY PROFILE");
         mp = factoryGVPMotionProfile(finalB);
-        yDebug("returned from GVP factory");
         if (mp == NULL){
             yError("factory returned error");
             return false;
         }
     }
     else{
-        yError("Error.Type is unknown.");
+        yError("Error. Factory type is unknown.");
         return false;
     }
 
@@ -813,9 +811,8 @@ void handProfilerThread::run() {
         }
 
         double tend = Time::now();
-        double execTime = (tend-t) * 1000;
-        yInfo("diff=%f [s]", execTime);
-
+        //double execTime = (tend-t) * 1000;
+        //yInfo("DELTA_TIME = %f [s]", execTime);
 
     }
     //yDebug("before %f", Time::now());
