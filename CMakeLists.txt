@@ -4,10 +4,10 @@
 
 cmake_minimum_required(VERSION 3.12)
 
-project (motionprofiler)
+project (motionProfiler)
 
 find_package(ICUBcontrib REQUIRED)
-find_package(IPOPT)
+#find_package(IPOPT)
 list(APPEND CMAKE_MODULE_PATH ${ICUBCONTRIB_MODULE_PATH})
 
 include(ICUBcontribHelpers)
@@ -22,6 +22,5 @@ icubcontrib_set_default_prefix() #set CMAKE_INSTALL_PREFIX to the ICUBcontrib on
 add_subdirectory(src)
 add_subdirectory(app)
 
-#icubcontrib_finalize_export(attention)
 icubcontrib_set_default_prefix()
 icubcontrib_add_uninstall_target()        
