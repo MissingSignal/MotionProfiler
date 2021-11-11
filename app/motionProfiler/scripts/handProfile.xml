@@ -1,0 +1,70 @@
+<application>
+<name>motion Profiler</name>
+<dependencies> </dependencies>
+
+<module>
+        <name>gazebo</name>
+        <parameters></parameters>
+        <node>localhost</node>
+        <stdio></stdio>
+        <tag>gazebo</tag>
+</module>
+
+<module>
+        <name>yarprobotinterface</name>
+        <parameters>--context simCartesianControl --config no_legs.xml</parameters>
+        <dependencies>
+            <port timeout="20">/icubSim/torso/state:o</port>
+            <port timeout="20">/icubSim/left_arm/state:o</port>
+            <port timeout="20">/icubSim/right_arm/state:o</port>
+        </dependencies>
+        <environment>YARP_FORWARD_LOG_ENABLE=1</environment>
+        <ensure>
+           <wait when="stop">5</wait>
+        </ensure>
+        <node>localhost</node>
+</module>
+
+<module>
+        <name>iKinCartesianSolver</name>
+        <parameters>--context simCartesianControl --part right_arm</parameters>
+        <dependencies>
+            <port timeout="20">/icubSim/torso/state:o</port>
+            <port timeout="20">/icubSim/right_arm/state:o</port>
+        </dependencies>
+        <environment>YARP_FORWARD_LOG_ENABLE=1</environment>
+        <node>localhost</node>
+</module>
+
+<module>
+        <name>iCubGui</name>
+        <parameters></parameters>
+        <node>localhost</node>
+        <stdio></stdio>
+        <tag>iCubGui</tag>
+</module>
+
+<module>
+        <name>motionProfiler</name>
+        <parameters>--robot icubSim --part right_arm</parameters>
+        <node>localhost</node>
+        <stdio></stdio>
+        <environment>YARP_FORWARD_LOG_ENABLE=1</environment>
+        <tag>motionProfiler</tag>
+</module>
+
+<!-- ################################################################## -->
+
+<connection>
+      <from>/icubSim/right_arm/state:o</from>
+      <to>/iCubGui/right_arm:i</to>
+      <protocol>udp</protocol>
+</connection>
+
+<connection>
+      <from>/handProfiler/gui:o</from>
+      <to>/iCubGui/objects</to>
+      <protocol>udp</protocol>
+</connection>
+
+</application>
