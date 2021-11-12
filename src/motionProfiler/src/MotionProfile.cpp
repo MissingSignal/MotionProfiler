@@ -1537,13 +1537,14 @@ Vector* GVPMotionProfile::compute(double t){
 
 Matrix GVPMotionProfile::offline_compute(yarp::dev::ICartesianControl *icart) {
     yInfo("OFFLINE JOINTS TRAJECTORY COMPUTATION FOR GVP CLASS");
-    int n_joints = 17; //TO DO to be read
+    int n_joints = 10; //TO DO number of actuated joints to be read
     int steps = velocityProfile.size();
     const float delta_time = 0.01;
     double thetaStart = 0;
     angVelocity = 0;
     theta = 0;
     thetaPrev = 0;
+    step_counter = 0;
 
     // hand pose and orientation, final(hat) may differ from the commanded desired
     yarp::sig::Vector xd(3),xd_final(3),od(4),od_final(4);
@@ -1552,6 +1553,7 @@ Matrix GVPMotionProfile::offline_compute(yarp::dev::ICartesianControl *icart) {
     yarp::sig::Vector q_start,q_final;
 
     // Trajectory, matrix containing the joints config at each time step
+    // Dinamically resized because we could achieve the trajectory with less steps than expected  (computationally inefficient !)
     yarp::sig::Matrix trajectory(steps,n_joints);
 
     //get actual starting pose [CARTESIAN]
@@ -1560,7 +1562,7 @@ Matrix GVPMotionProfile::offline_compute(yarp::dev::ICartesianControl *icart) {
     icart->getDesired(xd,od,q_start);
 
     while(inRange(theta)){
-        if (step_counter%10 == 0 && step_counter != steps) {
+        if (step_counter%50 == 0 && step_counter != steps) {
             yInfo("STEP = %i/%i", step_counter, steps);
         }
 
@@ -1581,6 +1583,16 @@ Matrix GVPMotionProfile::offline_compute(yarp::dev::ICartesianControl *icart) {
         //ask the solver to compute the joint angles that allow to reach that position
         //note that the solver takes into account the prevoious position of the robot
         icart->askForPose(q_start,xd,od,xd_final,od_final,q_final);
+        cout << "encoders: " << q_final.toString() << endl;
+
+        icart->goToPose(xd,od);
+//        bool motionDone = false;
+//        cout << "Movement performed with Cartesian Control" << endl;
+//        while(!motionDone){
+//            icart->checkMotionDone(&motionDone);
+//            Time::delay(0.005);
+//        }
+
         //starting joint position, CART desired pos+ori, CART target pos+ori, final joint config.
 
         //add joints config to the trajectory
@@ -1592,7 +1604,11 @@ Matrix GVPMotionProfile::offline_compute(yarp::dev::ICartesianControl *icart) {
         q_start = q_final;
         step_counter++;
     }
-    yInfo("* STEP = %i/%i * ", step_counter, steps);
+    yInfo("STEP = %i/%i", step_counter, steps);
+
+    // remove the last rows of the trajectory matrix that have not beeen written
+    trajectory.resize(step_counter, n_joints);
+
 
     return trajectory;
 }

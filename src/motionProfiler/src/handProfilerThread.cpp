@@ -721,7 +721,8 @@ void handProfilerThread::run() {
             if(mp->type == "GVP") { //to add mp->type == "CVP" ||
                 yInfo("start offline trajectory precomputation");
                 Matrix joints_trajectory = mp->offline_compute(icart);
-
+                //yInfo("trajectory %s", joints_trajectory.toString().c_str());
+                yInfo("Performing the trajcetory in POSITION DIRECT MODE");
                 playTrajectory(joints_trajectory);
 
                 state = none;
@@ -761,12 +762,8 @@ void handProfilerThread::run() {
                     ToSave_Z.push_back(hand_pose[2]);
                     ToSave_Time.push_back(Time::now());
 
-                    //icart->goToPose(xd,od);
-                    icart->goToPosition(xd);
-                    bool motionDone;
-                    icart->checkMotionDone(&motionDone);
-                    cout << "waiting for motion to finish" << endl;
-
+                    icart->goToPose(xd,od,0.01);
+                    bool motionDone = false;
                     while(!motionDone){
                         icart->checkMotionDone(&motionDone);
                         Time::delay(0.005);
@@ -1147,36 +1144,66 @@ void handProfilerThread::playFromFile() {
             }
         }
     }
-
-    return;
 }
 
 void handProfilerThread::playTrajectory(Matrix &trajectory) {
-    double playJoints[17];
-    double executionTime = 0;
-    double previousTime = 0;
 
     size_t step_count = trajectory.rows();
 
+    int n_joints = trajectory.cols(); // TO DO check that njoints is the same as njoints in the constructor
+    idir->getAxes(&n_joints);
+
+    // remove first columns dedicated to the body
+    trajectory.removeCols(0, 3);
+
+    if (n_joints != trajectory.cols()) {
+        yError("Number of joints in trajectory (%li) does not match the number of joints in the controller (%i)", trajectory.cols(), n_joints);
+        return;
+    }
+
+
+    //arm has 7 DOF + 3 from the body
+    // here we should check the number of DOF (if the torso is enabled)
+
+    cout << "Playing trajectory with " << step_count << " steps" << endl;
+    cout << "Trajectory has " << n_joints << " joints (manually set)" << endl;
+    cout << "Trajectory has " << njoints << " joints (automatically read)" << endl;
+
     Vector encoders;
     Vector command;
-    encoders.resize(njoints);
-    command.resize(njoints);
+    encoders.resize(n_joints);
+    command.resize(n_joints);
 
     encs->getEncoders(encoders.data()); // encoder reading from current position
+
 
     //set all joints in position direct mode
     for (int i = 0; i < 16; i++) {
         ictrl->setControlMode(i, VOCAB_CM_POSITION_DIRECT);
     }
 
+    //going to initial position
+    Vector start_pos = trajectory.getRow(step_count-1);
+    cout << "Going to initial position with encoders equal to: " << start_pos.toString().c_str() << endl;
+    const int joints_to_control[] = {0, 1, 2, 3, 4, 5, 6};
+    idir->setPositions(n_joints, joints_to_control, start_pos.data());
+    Time::delay(10.0);
+
+
     // read trajectory and iterate trough the rows
     //for i that goes from 0 to step_count
 
     for (int i=0; i<step_count; i++){
         command = trajectory.getRow(i);
-        idir->setPositions(command.data());
+        cout << "command: " << command.data() << endl;
+
+        //check that vector is not zero
+        //idir->setPositions(command.data());
+
+        Time::delay(0.01);
     }
+
+    yInfo("Movement done");
 }
 
 void handProfilerThread::limitTorsoYaw() {
