@@ -285,7 +285,7 @@ public:
     */
     virtual yarp::sig::Vector* compute(double t) = 0;
 
-    virtual yarp::sig::Matrix offline_compute(yarp::dev::ICartesianControl *icart) {}; // We should remove this place holder
+    virtual yarp::sig::Matrix offline_compute(yarp::dev::ICartesianControl *icart, yarp::dev::IEncoders *encs) {}; // We should remove this place holder
 };
 
 /**
@@ -369,7 +369,7 @@ public:
     void setVelocity(yarp::sig::Vector vel) {velocityProfile = vel;};
     void preComputation(const double t, const double theta) override;
     yarp::sig::Vector* compute(double t) override;
-    yarp::sig::Matrix offline_compute(yarp::dev::ICartesianControl *icart) override;
+    yarp::sig::Matrix offline_compute(yarp::dev::ICartesianControl *icart, yarp::dev::IEncoders *encs);
 
 };
 

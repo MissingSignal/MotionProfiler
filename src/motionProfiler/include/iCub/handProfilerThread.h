@@ -107,7 +107,7 @@ protected:
 
     yarp::dev::PolyDriver client;
     yarp::dev::PolyDriver robotDevice;
-    yarp::dev::IPositionDirect *idir;               // Position DIrect for movement from file
+    yarp::dev::IPositionDirect *idir;               // Position Direct for movement from file
     yarp::dev::IEncoders *encs;                     // to read encoders values
     yarp::dev::IControlMode *ictrl;                // to set control mode of the joints
     yarp::dev::ICartesianControl *icart;            // cartesian controller to generate and move
@@ -290,7 +290,7 @@ public:
     *  function that start the execution from A->B->C
     *  @param reverse indicates whether ther execution is reverse C->B->A
     */
-    bool startExecution(const bool reverse);
+    bool startExecution();
 
     /**
     *  function that start the execution from A->B->C

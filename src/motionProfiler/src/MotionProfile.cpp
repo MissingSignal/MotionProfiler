@@ -1535,11 +1535,11 @@ Vector* GVPMotionProfile::compute(double t){
   return xd;
 }
 
-Matrix GVPMotionProfile::offline_compute(yarp::dev::ICartesianControl *icart) {
+Matrix GVPMotionProfile::offline_compute(yarp::dev::ICartesianControl *icart, yarp::dev::IEncoders *encs) {
     yInfo("OFFLINE JOINTS TRAJECTORY COMPUTATION FOR GVP CLASS");
-    int n_joints = 10; //TO DO number of actuated joints to be read
+    std::ofstream myfile ("Velocity_Report.csv");
     int steps = velocityProfile.size();
-    const float delta_time = 0.01;
+    const float delta_time = 0.01; //time interval between trajectory points 10 ms
     double thetaStart = 0;
     angVelocity = 0;
     theta = 0;
@@ -1548,20 +1548,35 @@ Matrix GVPMotionProfile::offline_compute(yarp::dev::ICartesianControl *icart) {
 
     // hand pose and orientation, final(hat) may differ from the commanded desired
     yarp::sig::Vector xd(3),xd_final(3),od(4),od_final(4);
+    yarp::sig::Vector x_dot(3),o_dot(4);
 
     // joints configuration
-    yarp::sig::Vector q_start,q_final;
+    yarp::sig::Vector q_start(10),q_final(10);  //3 values for the torso + 7 for the arm
 
     // Trajectory, matrix containing the joints config at each time step
-    // Dinamically resized because we could achieve the trajectory with less steps than expected  (computationally inefficient !)
-    yarp::sig::Matrix trajectory(steps,n_joints);
+    yarp::sig::Matrix trajectory(steps,10); //3 values for the torso + 7 for the arm
+    // Velcoity Matrix, matrix containing the joints velcoity at each time step
+    yarp::sig::Matrix velocity(steps,3); //3 values for X,Y,Z components of the velocity
 
-    //get actual starting pose [CARTESIAN]
-    icart->getPose(xd,od);
-    //get actual starting pose q_start [JOINTS]
-    icart->getDesired(xd,od,q_start);
+    //get actual starting pose [JOINTS]
+//    yInfo("GETTING STARTING JOINT POSITION");
+//    Vector arm_pose(7);
+//    encs->getEncoders(arm_pose.data()); // read arm pose
+//    q_start.setSubvector(3,arm_pose); //append arm pose to the torso pose (zeros)
+//    //get actuol pose [CARTESIAN]
+//    icart->getPose(xd,od);
+
+    //PRINT Q_START
+    yInfo("q_start: %s",q_start.toString().c_str());
+
+    //we don't care about the hand orientation
+    icart->setPosePriority("position");
 
     while(inRange(theta)){
+        auto time = Time::now();
+        icart->getTaskVelocities(x_dot,o_dot);
+        velocity.setRow(step_counter,x_dot);
+
         if (step_counter%50 == 0 && step_counter != steps) {
             yInfo("STEP = %i/%i", step_counter, steps);
         }
@@ -1582,11 +1597,13 @@ Matrix GVPMotionProfile::offline_compute(yarp::dev::ICartesianControl *icart) {
 
         //ask the solver to compute the joint angles that allow to reach that position
         //note that the solver takes into account the prevoious position of the robot
-        icart->askForPose(q_start,xd,od,xd_final,od_final,q_final);
-        cout << "encoders: " << q_final.toString() << endl;
+        //////////////icart->askForPose(q_start,xd,od,xd_final,od_final,q_final);
+
+        //print q_final
+        //yInfo("q_final: %s",q_final.toString().c_str());
 
         icart->goToPose(xd,od);
-//        bool motionDone = false;
+
 //        cout << "Movement performed with Cartesian Control" << endl;
 //        while(!motionDone){
 //            icart->checkMotionDone(&motionDone);
@@ -1596,19 +1613,34 @@ Matrix GVPMotionProfile::offline_compute(yarp::dev::ICartesianControl *icart) {
         //starting joint position, CART desired pos+ori, CART target pos+ori, final joint config.
 
         //add joints config to the trajectory
-        trajectory.setRow(step_counter, q_final);
+        ////////////////trajectory.setRow(step_counter, q_final);
 
         // update the variables
         radiusPrev = radius;
         thetaPrev  = theta;
         q_start = q_final;
         step_counter++;
+        //print time
+        while(Time::now() - time < delta_time){
+            Time::delay(0.001);
+        }
+        yInfo("DELTA TIME: %f",Time::now()-time);
     }
     yInfo("STEP = %i/%i", step_counter, steps);
 
+    /////////////////////// clean the trajectory ///////////////////
     // remove the last rows of the trajectory matrix that have not beeen written
-    trajectory.resize(step_counter, n_joints);
-
+    trajectory.resize(step_counter, 10);
+    // remove first columns dedicated to the torso that is not actuated
+    trajectory.removeCols(0, 3);
+    //set the hand joints 5 6 7 to a constant position
+//    for (int i=5;i<7;i++){
+//        trajectory.setCol(i,0);
+//    }
+    ///////////////////////////////////////////////////////////////
+    yInfo("PRINTING VELOCITY REPORT ON FILE");
+    myfile << velocity.toString().c_str() << std::endl;
+    myfile.close();
 
     return trajectory;
 }

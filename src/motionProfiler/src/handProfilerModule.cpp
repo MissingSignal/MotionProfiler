@@ -1,3 +1,5 @@
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "cert-err58-cpp"
 // -*- mode:C++; tab-width:4; c-basic-offset:4; indent-tabs-mode:nil -*-
 
 /*
@@ -34,11 +36,7 @@ const int32_t  COMMAND_VOCAB_FAILED  = yarp::os::createVocab32('f','a','i','l');
 const int32_t  COMMAND_VOCAB_TRED    = yarp::os::createVocab32('t','r','e','d');
 const int32_t  COMMAND_VOCAB_TGRE    = yarp::os::createVocab32('t','g','r','e');
 const int32_t  COMMAND_VOCAB_TBLU    = yarp::os::createVocab32('t','b','l','u');
-const int32_t  COMMAND_VOCAB_FRED    = yarp::os::createVocab32('f','r','e','d');       // request of fovea blob color (red)
-const int32_t  COMMAND_VOCAB_FBLU    = yarp::os::createVocab32('f','b','l','u');       // request of fovea blob color (red)
-const int32_t  COMMAND_VOCAB_MINJ    = yarp::os::createVocab32('m','i','n','j');
 const int32_t  COMMAND_VOCAB_TTPL    = yarp::os::createVocab32('T','T','P','L');
-const int32_t  COMMAND_VOCAB_MANY    = yarp::os::createVocab32('m','a','n','y');
 const int32_t  COMMAND_VOCAB_XAXI    = yarp::os::createVocab32('X','A','X','I');
 const int32_t  COMMAND_VOCAB_YAXI    = yarp::os::createVocab32('Y','A','X','I');
 const int32_t  COMMAND_VOCAB_ZAXI    = yarp::os::createVocab32('Z','A','X','I');
@@ -435,7 +433,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
             case COMMAND_VOCAB_RES:
                 {
                     bool rev = false;
-                    if(0!=rThread) {
+                    if(nullptr!=rThread) {
                         reply.addString("OK");
                         rThread->startResetting();
 
@@ -446,7 +444,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
             case COMMAND_VOCAB_SIM:
                 {
                     bool rev = false;
-                    if(0!=rThread) {
+                    if(nullptr!=rThread) {
                         reply.addString("OK");
 
                         if(command.size() == 3) {
@@ -459,21 +457,22 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                         rThread->startSimulation(rev);
 
                     }
-                    ok = true;
                 }
             break;
             case COMMAND_VOCAB_EXE:
                 {
-                    if(0!=rThread) {
-                        reply.addString("OK");
-                        rThread->startExecution(false);
+                    if(nullptr!=rThread) {
+                        if (rThread->startExecution()) {
+                            reply.addString("OK");
+                        } else {
+                            reply.addString("ERROR - MOTION PROFILE NOT INITIALIZED");
+                        }
                     }
-                    ok = true;
                 }
             break;
             case COMMAND_VOCAB_FILE:
                 {
-                    if(command.get(2).asVocab32() == COMMAND_VOCAB_SPEED && 0!=rThread) {
+                    if(command.get(2).asVocab32() == COMMAND_VOCAB_SPEED && nullptr!=rThread) {
                         if(command.get(3).isFloat64() || command.get(3).isInt32()){
                             reply.addString("OK");
                             rThread->startJoints(command.get(3).asFloat64());
@@ -486,7 +485,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                         }
                     }else{
                         // when we have no SPEE command
-                        if(0!=rThread) {
+                        if(nullptr!=rThread) {
                             reply.addString("OK");
 
 
@@ -514,7 +513,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
             case COMMAND_VOCAB_JOI:
                 {
 
-                    if(0!=rThread) {
+                    if(nullptr!=rThread) {
                         reply.addString("OK");
 
                         rThread->saveJoints();
@@ -538,7 +537,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
             switch(command.get(1).asVocab32()) {
             case COMMAND_VOCAB_ON:
                 {
-                    if(0!=rThread) {
+                    if(nullptr!=rThread) {
                         reply.addString("OK");
                         rThread->setGrasp(true);
                     }
@@ -547,7 +546,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
             break;
             case COMMAND_VOCAB_OFF:
                 {
-                    if(0!=rThread) {
+                    if(nullptr!=rThread) {
                         reply.addString("OK");
                         rThread->setGrasp(false);
                     }
@@ -556,7 +555,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
             break;
             case COMMAND_VOCAB_RES:
                 {
-                    if(0!=rThread) {
+                    if(nullptr!=rThread) {
                         reply.addString("OK");
                         rThread->graspReset();
                     }
@@ -577,7 +576,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
             case COMMAND_VOCAB_CVV:
                 {
                     yInfo("activating grasp costant velocity with VIAPOINT");
-                    if(0!=rThread) {
+                    if(nullptr!=rThread) {
                         reply.addString("OK");
                         //GRAZ CVV (((sphere) (0.3 0.3 0.3)))
 
@@ -601,7 +600,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
             case COMMAND_VOCAB_ON:
                 {
 
-                    if(0!=rThread) {
+                    if(nullptr!=rThread) {
                         reply.addString("OK");
 
                         rThread->setGrasp(true);
@@ -613,7 +612,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
             case COMMAND_VOCAB_OFF:
                 {
 
-                    if(0!=rThread) {
+                    if(nullptr!=rThread) {
                         reply.addString("OK");
 
                         rThread->setGrasp(false);
@@ -625,7 +624,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
             case COMMAND_VOCAB_RES:
                 {
 
-                    if(0!=rThread) {
+                    if(nullptr!=rThread) {
                         reply.addString("OK");
                         rThread->graspReset();
 
@@ -646,7 +645,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
         rec = true;
         {
             if(command.get(1).asVocab32() == COMMAND_VOCAB_FILE) {
-                if(0!=rThread) {
+                if(nullptr!=rThread) {
                     reply.addString("OK");
 
                     rThread->loadFile(command.get(2).asString());
@@ -659,7 +658,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
     case COMMAND_VOCAB_REPS:
         rec = true;
         {
-            if(0!=rThread && command.get(1).asInt32() != 0) {
+            if(nullptr!=rThread && command.get(1).asInt32() != 0) {
               reply.addString("OK");
 
               rThread->setRepsNumber(command.get(1).asInt32());
@@ -676,7 +675,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
             case COMMAND_VOCAB_STAR:
                 {
 
-                    if(0!=rThread) {
+                    if(nullptr!=rThread) {
                         reply.addString("OK");
 
                         rThread->setPartnerStart();
@@ -688,7 +687,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
             case COMMAND_VOCAB_STOP:
                 {
 
-                    if(0!=rThread) {
+                    if(nullptr!=rThread) {
                         reply.addString("OK");
 
                         rThread->setPartnerStop();
@@ -700,7 +699,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
             case COMMAND_VOCAB_TIME:
                 {
 
-                    if(0!=rThread && command.get(2).asFloat64() != 0) {
+                    if(nullptr!=rThread && command.get(2).asFloat64() != 0) {
                         reply.addString("OK");
 
                         rThread->setPartnerTime(command.get(2).asFloat64());
@@ -721,7 +720,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
     case COMMAND_VOCAB_SYNC:
         {
             rec = true;
-            if(0!=rThread) {
+            if(nullptr!=rThread) {
                 reply.addString("OK");
 
                 rThread->setPartnerTime(0.0);
@@ -737,7 +736,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
 
             case COMMAND_VOCAB_XAXI:
                 {
-                    if(0!=rThread) {
+                    if(nullptr!=rThread) {
                         reply.addString("OK");
                         rThread->rotAxisX(5.0);
                     }
@@ -746,7 +745,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
             break;
             case COMMAND_VOCAB_YAXI:
                 {
-                    if(0!=rThread) {
+                    if(nullptr!=rThread) {
                         reply.addString("OK");
                         rThread->rotAxisY(5.0);
                     }
@@ -755,7 +754,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                 break;
             case COMMAND_VOCAB_ZAXI:
                 {
-                    if(0!=rThread) {
+                    if(nullptr!=rThread) {
                         reply.addString("OK");
                         rThread->rotAxisZ(5.0);
                     }
@@ -778,7 +777,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
 
             case COMMAND_VOCAB_CLR:
                 {
-                    if(0!=rThread) {
+                    if(nullptr!=rThread) {
                       rThread->clearGui();
                       reply.addString("OK");
                     }
@@ -801,7 +800,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                 {
                     rec = true;
                     reply.addString("constant");
-                    if(0!=rThread){
+                    if(nullptr!=rThread){
                         if(command.size() == 3) {
                           Bottle* finalB = command.get(2).asList();
                           yDebug("bottle in threadInit %s", finalB->toString().c_str());
@@ -816,7 +815,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                 {
                     rec = true;
                     reply.addString("minJerk");
-                    if(0!=rThread){
+                    if(nullptr!=rThread){
                         Bottle* finalB = command.get(2).asList();
                         if(rThread->factory("MJP",*finalB)) {
                             ok = true;
@@ -828,7 +827,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                 {
                     rec = true;
                     reply.addString("genVel");
-                    if(0!=rThread){
+                    if(nullptr!=rThread){
                         Bottle* params = command.get(2).asList();
                         if(rThread->factory("GVP",*params)) {
                           ok = true;
@@ -840,7 +839,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                 {
                     rec = true;
                     reply.addString("nonBioLaw");
-                    if(0!=rThread){
+                    if(nullptr!=rThread){
                         //GEN TTPL (((-0.3 -0.0 0.1) (-0.3 -0.1 0.2) (-0.3 -0.1 0.0) (0.0 1.57 4.71) (0.1 0.1)))
                         if(command.size() == 3) {
                             Bottle* finalB = command.get(2).asList();
@@ -856,7 +855,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                 {
                     rec = true;
                     reply.addString("twoThirdPowerLaw");
-                    if(0!=rThread){
+                    if(nullptr!=rThread){
                         //GEN TT (((-0.3 -0.0 0.1) (-0.3 -0.1 0.2) (-0.3 -0.1 0.0) (0.0 1.57 4.71) (0.1 0.1)))
                         if(command.size() == 3) {
                             Bottle* finalB = command.get(2).asList();
@@ -891,8 +890,6 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
     }
 
     return ok;
-
-
 }
 
 /* Called periodically every getPeriod() seconds */
@@ -906,3 +903,5 @@ double handProfilerModule::getPeriod()
     /* module periodicity (seconds), called implicitly by myModule */
     return 1.0;
 }
+
+#pragma clang diagnostic pop

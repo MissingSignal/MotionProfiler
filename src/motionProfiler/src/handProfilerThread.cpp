@@ -189,7 +189,7 @@ bool handProfilerThread::threadInit() {
 
     if (!client.open(optionCartesian)) {
         yInfo("Client not available. Proceeding to pure imagination action performance ");
-        icart = 0;
+        icart = nullptr;
     }
     else {
         yInfo("preparing the icart");
@@ -293,7 +293,7 @@ bool handProfilerThread::threadInit() {
 
         clientGazeCtrl = new PolyDriver();
         clientGazeCtrl->open(optionGaze);
-        igaze = NULL;
+        igaze = nullptr;
 
         if (clientGazeCtrl->isValid()) {
            clientGazeCtrl->view(igaze);
@@ -372,7 +372,7 @@ bool handProfilerThread::threadInit() {
     }
     else{
         yInfo("grasping not active during initialization");
-        fp = NULL;
+        fp = nullptr;
     }
     yInfo("handProfiler thread correctly started");
 
@@ -389,7 +389,7 @@ void handProfilerThread::setGrasp(bool grasp) {
     if(grasp) {
         yInfo("Grasping ON");
         //checking and instantiating the fp oject correctly
-        if (fp==NULL) {
+        if (fp==nullptr) {
             //fp was not initialized in the threadInit
             fp = factoryCVVFingerProfile();
         }
@@ -400,7 +400,7 @@ void handProfilerThread::setGrasp(bool grasp) {
     }else{
         yInfo("Grasping OFF");
         //setting the pointer to the finger class fp to null
-        fp = NULL;
+        fp = nullptr;
     }
     encs->getEncoders(fingerJoints.data());
     Time::delay(1.0);
@@ -571,9 +571,12 @@ bool handProfilerThread::resetExecution() {
     return result;
 }
 
-bool handProfilerThread::startExecution(const bool _reverse) {
-    //count = 0;
-    //mp->setReverse(_reverse);
+bool handProfilerThread::startExecution() {
+    //valuto che mp sia inizializzato
+    if(!mp){
+        yError("mp is not initialized");
+        return false;
+    }
     idle = false;
     state = execution;
     firstIteration = true;
@@ -720,10 +723,10 @@ void handProfilerThread::run() {
             //start offline trajectory precomputation
             if(mp->type == "GVP") { //to add mp->type == "CVP" ||
                 yInfo("start offline trajectory precomputation");
-                Matrix joints_trajectory = mp->offline_compute(icart);
+                Matrix joints_trajectory = mp->offline_compute(icart,encs);
                 //yInfo("trajectory %s", joints_trajectory.toString().c_str());
-                yInfo("Performing the trajcetory in POSITION DIRECT MODE");
-                playTrajectory(joints_trajectory);
+                yInfo("Performing the trajectory in POSITION DIRECT MODE");
+                //playTrajectory(joints_trajectory);
 
                 state = none;
                 idle = true;
@@ -1148,59 +1151,72 @@ void handProfilerThread::playFromFile() {
 
 void handProfilerThread::playTrajectory(Matrix &trajectory) {
 
+    // read the joints to control from the file
     size_t step_count = trajectory.rows();
+    //read the actuated joints
+    idir->getAxes(&njoints);
 
-    int n_joints = trajectory.cols(); // TO DO check that njoints is the same as njoints in the constructor
-    idir->getAxes(&n_joints);
-
-    // remove first columns dedicated to the body
-    trajectory.removeCols(0, 3);
-
-    if (n_joints != trajectory.cols()) {
-        yError("Number of joints in trajectory (%li) does not match the number of joints in the controller (%i)", trajectory.cols(), n_joints);
+    if (njoints != trajectory.cols()) {
+        yError("Number of joints in trajectory (%li) does not match the number of joints in the controller (%i)", trajectory.cols(), njoints);
         return;
     }
 
 
     //arm has 7 DOF + 3 from the body
-    // here we should check the number of DOF (if the torso is enabled)
-
     cout << "Playing trajectory with " << step_count << " steps" << endl;
-    cout << "Trajectory has " << n_joints << " joints (manually set)" << endl;
-    cout << "Trajectory has " << njoints << " joints (automatically read)" << endl;
 
     Vector encoders;
     Vector command;
-    encoders.resize(n_joints);
-    command.resize(n_joints);
-
-    encs->getEncoders(encoders.data()); // encoder reading from current position
-
+    encoders.resize(njoints);
+    command.resize(njoints);
 
     //set all joints in position direct mode
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < 17; i++) {
         ictrl->setControlMode(i, VOCAB_CM_POSITION_DIRECT);
     }
+    Time::delay(1.0);
 
-    //going to initial position
-    Vector start_pos = trajectory.getRow(step_count-1);
-    cout << "Going to initial position with encoders equal to: " << start_pos.toString().c_str() << endl;
-    const int joints_to_control[] = {0, 1, 2, 3, 4, 5, 6};
-    idir->setPositions(n_joints, joints_to_control, start_pos.data());
+    encs->getEncoders(encoders.data()); // encoder reading from current position
+    Vector prev_command = encoders; //trajectory.getRow(0);
+
+    cout << "Starting from: " << endl << prev_command.toString().c_str() <<  endl;
+
+    yarp::dev::IPositionControl *ipos;
+    robotDevice.view (ipos);
+    ipos->positionMove(trajectory.getRow(0).data());
+    //idir->setPositions(prev_command.data());
     Time::delay(10.0);
 
+    //printing the trajectory
+    cout << "Original Trajectory: " << endl << trajectory.toString().c_str() <<  endl;
 
-    // read trajectory and iterate trough the rows
-    //for i that goes from 0 to step_count
+    // checking that target joints positions are safe, if not replace the wrong values
+    // explaination: position direct mode can be used only for small angular movements
+//    cout << "Checking that target joints positions are safe" << endl;
+//    for (int i = 0; i < step_count; i++) {
+//        command = trajectory.getRow(i);
+//        for (int j = 0; j < njoints; j++) {
+//            //fix the single encoder value for each row by setting the previous value
+//            if (abs(command[j]-prev_command[j]) > 10.0) {command[j] = prev_command[j];}
+//        }
+//        //update
+//        trajectory.setRow(i, command);
+//        prev_command = command;
+//    }
 
+    //printing the trajectory
+    //cout << "Filtered Trajectory:" <<  endl<< trajectory.toString().c_str() <<  endl;
+
+    // finally move the robot
     for (int i=0; i<step_count; i++){
-        command = trajectory.getRow(i);
-        cout << "command: " << command.data() << endl;
-
-        //check that vector is not zero
-        //idir->setPositions(command.data());
-
-        Time::delay(0.01);
+        //start timer
+        auto time = Time::now();
+        //command = trajectory.getRow(i).data();
+        idir->setPositions(trajectory.getRow(i).data());
+        //icart->getTaskVelocities(xdot,odot); read velocity
+        Time::delay(0.05);
+        //check time elapesed
+        cout << "Time elapsed: " << Time::now() - time << endl;
     }
 
     yInfo("Movement done");
