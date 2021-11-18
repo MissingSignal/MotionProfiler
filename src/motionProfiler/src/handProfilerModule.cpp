@@ -63,7 +63,7 @@ const int32_t  COMMAND_VOCAB_MBA     = yarp::os::createVocab32('m','B','A');    
 const int32_t  COMMAND_VOCAB_SET     = yarp::os::createVocab32('s','e','t');
 const int32_t  COMMAND_VOCAB_GET     = yarp::os::createVocab32('g','e','t');
 const int32_t  COMMAND_VOCAB_GEN     = yarp::os::createVocab32('G','E','N');
-const int32_t  COMMAND_VOCAB_CON     = yarp::os::createVocab32('C','V','P');
+const int32_t  COMMAND_VOCAB_CVP     = yarp::os::createVocab32('C','V','P');
 const int32_t  COMMAND_VOCAB_MJP     = yarp::os::createVocab32('M','J','P');
 const int32_t  COMMAND_VOCAB_GVP     = yarp::os::createVocab32('G','V','P');
 const int32_t  COMMAND_VOCAB_SIM     = yarp::os::createVocab32('S','I','M');
@@ -232,13 +232,9 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
         reply.addString("quitting");
         return false;
     }
-    //else if (command.get(0).asString()=="help") {
-    //    cout << helpMessage;
-    //    reply.addString("ok");
-    //}
 
-    bool ok = false;
-    bool rec = false; // is the command recognized?
+    bool rec = false; // true if the VOCAB is received
+    bool ok = false;  // true if the VOCAB is executed
 
     mutex.wait();
 
@@ -253,9 +249,9 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
 
             reply.addString("GENERATE PROFILES (left hand)");
             reply.addString("GEN CVP  : generate constant velocity profile");
-	          reply.addString("         : (((O -0.3 -0.1 0.1) (A -0.3 -0.0 0.1) (B -0.3 -0.1 0.2) (theta 0.0 1.57) (param 0.1)))");
+            reply.addString("         : (((O -0.3 -0.1 0.1) (A -0.3 -0.0 0.1) (B -0.3 -0.1 0.2) (theta 0.0 1.57) (param 0.1)))");
             reply.addString("GEN MJP  : generate minimum jerk profile");
-	          reply.addString("         : (((O -0.3 -0.1 0.1) (A -0.3 -0.0 0.1) (B -0.3 -0.1 0.2) (theta 0.0 1.57) (param 1.57 3.0)))");
+            reply.addString("         : (((O -0.3 -0.1 0.1) (A -0.3 -0.0 0.1) (B -0.3 -0.1 0.2) (theta 0.0 1.57) (param 1.57 3.0)))");
             reply.addString("GEN GVP  : generate general velocity profile");
             reply.addString("         : (((O -0.3 -0.0 0.1) (A -0.3 0.1 0.1) (B -0.3 -0.0 0.2) (theta 0.0 1.57) (param 0.1)))");
             reply.addString("GEN TTPL : generate NON two-third power law profile");
@@ -267,8 +263,8 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
             reply.addString("PALM CUS (-0.076 -0.974 0.213 3.03) ");
 
             reply.addString("START simulation and execute");
-            reply.addString("STAR SIM : start simulation (yellow)");
-            reply.addString("STAR EXE : start execution  (green)");
+            reply.addString("STAR SIM : start simulation (yellow plot)");
+            reply.addString("STAR EXE : start execution  (green plot)");
             reply.addString("STAR RES : start resetting of the posture");
             reply.addString("SIM CLR  : simulator cleaning");
             reply.addString("STAR FILE SPEE #value: start execution from file with speed multiplied for the value, if omitted default value is 1.0");
@@ -280,8 +276,6 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
             reply.addString("GRAS ON: turn on grasping");
             reply.addString("GRAS RES: reset the open hand");
             reply.addString("GRAZ CVV (params): constant velocity grasping");
-            reply.addString("movimento JULIA   GEN TTL (((O -0.3 -0.15 0.05) (A -0.3 -0.3 0.05) (B -0.3 -0.15 0.1) (C -0.3 -0.0 0.05) (theta 0.0 1.57 3.14) (axes 0.15 0.05) (param 0.01 0.33)))");
-
             ok = true;
         }
         break;
@@ -346,7 +340,6 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
 
             case COMMAND_VOCAB_MAXDB:
                 {
-
                     reply.addInt32(0);
                     ok = true;
                 }
@@ -377,8 +370,6 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
     case COMMAND_VOCAB_PALM:
         rec = true;
         {
-            //reply.addVocab32(COMMAND_VOCAB_IS);
-            //reply.add(command.get(1));
             switch(command.get(1).asVocab32()) {
 
             case COMMAND_VOCAB_DOWN:
@@ -436,9 +427,8 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                     if(nullptr!=rThread) {
                         reply.addString("OK");
                         rThread->startResetting();
-
+                        ok = true;
                     }
-                    ok = true;
                 }
             break;
             case COMMAND_VOCAB_SIM:
@@ -446,7 +436,6 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                     bool rev = false;
                     if(nullptr!=rThread) {
                         reply.addString("OK");
-
                         if(command.size() == 3) {
                             yInfo("Looking for REV COMMAND");
                             if(command.get(2).asVocab32() == COMMAND_VOCAB_REV) {
@@ -455,7 +444,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                             }
                         }
                         rThread->startSimulation(rev);
-
+                        ok = true;
                     }
                 }
             break;
@@ -464,6 +453,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                     if(nullptr!=rThread) {
                         if (rThread->startExecution()) {
                             reply.addString("OK");
+                            ok = true;
                         } else {
                             reply.addString("ERROR - MOTION PROFILE NOT INITIALIZED");
                         }
@@ -487,22 +477,18 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                         // when we have no SPEE command
                         if(nullptr!=rThread) {
                             reply.addString("OK");
-
-
+                            ok = true;
                             rThread->startJoints(1.0);
+                            ok = true;
                         }
-                        ok = true;
                         }
                 }
             break;
-
 
             default:
                 cout << "received an unknown request after a STAR" << endl;
                 break;
             }
-
-            ok = true;
         }
         break;
     case COMMAND_VOCAB_SAVE:
@@ -512,14 +498,11 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
 
             case COMMAND_VOCAB_JOI:
                 {
-
                     if(nullptr!=rThread) {
                         reply.addString("OK");
-
                         rThread->saveJoints();
-
+                        ok = true;
                     }
-                    ok = true;
                 }
             break;
 
@@ -527,8 +510,6 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                 cout << "received an unknown request" << endl;
                 break;
             }
-
-            ok = true;
         }
         break;
     case COMMAND_VOCAB_GRAS:
@@ -540,8 +521,8 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                     if(nullptr!=rThread) {
                         reply.addString("OK");
                         rThread->setGrasp(true);
+                        ok = true;
                     }
-                    ok = true;
                 }
             break;
             case COMMAND_VOCAB_OFF:
@@ -549,8 +530,8 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                     if(nullptr!=rThread) {
                         reply.addString("OK");
                         rThread->setGrasp(false);
+                        ok = true;
                     }
-                    ok = true;
                 }
             break;
             case COMMAND_VOCAB_RES:
@@ -558,15 +539,14 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                     if(nullptr!=rThread) {
                         reply.addString("OK");
                         rThread->graspReset();
+                        ok = true;
                     }
-                    ok = true;
                 }
             break;
             default:
                 cout << "received an unknown request" << endl;
                 break;
             }
-            ok = true;
         }
         break;
     case COMMAND_VOCAB_GRAZ:
@@ -578,23 +558,19 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                     yInfo("activating grasp costant velocity with VIAPOINT");
                     if(nullptr!=rThread) {
                         reply.addString("OK");
-                        //GRAZ CVV (((sphere) (0.3 0.3 0.3)))
-
                         if(command.size() == 3) {
                             Bottle* finalB = command.get(2).asList();
                             yDebug("bottle in threadInit %s", finalB->toString().c_str());
                             if(rThread->fingerfactory("CVV", *finalB)) {
                                 yInfo("fingerfactory:constant velocity viaPoint");
-                                //reply.addString("OK");
-                                ok = true;
                             }
                             else{
                                 yError("finger factory error");
                             }
                         }
                         rThread->setGrasp(true);
+                        ok = true;
                     }
-                    ok = true;
                 }
             break;
             case COMMAND_VOCAB_ON:
@@ -602,23 +578,18 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
 
                     if(nullptr!=rThread) {
                         reply.addString("OK");
-
                         rThread->setGrasp(true);
-
+                        ok = true;
                     }
-                    ok = true;
                 }
             break;
             case COMMAND_VOCAB_OFF:
                 {
-
                     if(nullptr!=rThread) {
                         reply.addString("OK");
-
                         rThread->setGrasp(false);
-
+                        ok = true;
                     }
-                    ok = true;
                 }
             break;
             case COMMAND_VOCAB_RES:
@@ -627,9 +598,8 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                     if(nullptr!=rThread) {
                         reply.addString("OK");
                         rThread->graspReset();
-
+                        ok = true;
                     }
-                    ok = true;
                 }
             break;
 
@@ -637,8 +607,6 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                 cout << "received an unknown request" << endl;
                 break;
             }
-
-            ok = true;
         }
         break;
     case COMMAND_VOCAB_LOAD:
@@ -649,9 +617,8 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                     reply.addString("OK");
 
                     rThread->loadFile(command.get(2).asString());
-
+                    ok = true;
                 }
-                ok = true;
             }
         }
         break;
@@ -660,11 +627,9 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
         {
             if(nullptr!=rThread && command.get(1).asInt32() != 0) {
               reply.addString("OK");
-
               rThread->setRepsNumber(command.get(1).asInt32());
-
+              ok = true;
             }
-            ok = true;
         }
         break;
     case COMMAND_VOCAB_MARK:
@@ -677,35 +642,27 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
 
                     if(nullptr!=rThread) {
                         reply.addString("OK");
-
                         rThread->setPartnerStart();
-
+                        ok = true;
                     }
-                    ok = true;
                 }
             break;
             case COMMAND_VOCAB_STOP:
                 {
-
                     if(nullptr!=rThread) {
                         reply.addString("OK");
-
                         rThread->setPartnerStop();
-
+                        ok = true;
                     }
-                    ok = true;
                 }
             break;
             case COMMAND_VOCAB_TIME:
                 {
-
                     if(nullptr!=rThread && command.get(2).asFloat64() != 0) {
                         reply.addString("OK");
-
                         rThread->setPartnerTime(command.get(2).asFloat64());
-
+                        ok = true;
                     }
-                    ok = true;
                 }
             break;
 
@@ -713,8 +670,6 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                 cout << "received an unknown request" << endl;
                 break;
             }
-
-            ok = true;
         }
         break;
     case COMMAND_VOCAB_SYNC:
@@ -722,11 +677,9 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
             rec = true;
             if(nullptr!=rThread) {
                 reply.addString("OK");
-
                 rThread->setPartnerTime(0.0);
-
+                ok = true;
             }
-            ok = true;
         }
         break;
     case COMMAND_VOCAB_ROT:
@@ -739,8 +692,8 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                     if(nullptr!=rThread) {
                         reply.addString("OK");
                         rThread->rotAxisX(5.0);
+                        ok = true;
                     }
-                    ok = true;
                 }
             break;
             case COMMAND_VOCAB_YAXI:
@@ -748,8 +701,8 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                     if(nullptr!=rThread) {
                         reply.addString("OK");
                         rThread->rotAxisY(5.0);
+                        ok = true;
                     }
-                    ok = true;
                 }
                 break;
             case COMMAND_VOCAB_ZAXI:
@@ -757,8 +710,8 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                     if(nullptr!=rThread) {
                         reply.addString("OK");
                         rThread->rotAxisZ(5.0);
+                        ok = true;
                     }
-                    ok = true;
                 }
                 break;
 
@@ -766,8 +719,6 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                 cout << "received an unknown request after a STAR" << endl;
                 break;
             }
-
-            ok = true;
         }
         break;
     case COMMAND_VOCAB_SIM:
@@ -780,12 +731,11 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                     if(nullptr!=rThread) {
                       rThread->clearGui();
                       reply.addString("OK");
+                      ok = true;
                     }
-                    ok = true;
                 }
             break;
             }
-
         }
         break;
     case COMMAND_VOCAB_GEN:
@@ -796,18 +746,15 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
             //reply.add(command.get(1));
             switch(command.get(1).asVocab32()) {
 
-            case COMMAND_VOCAB_CON:
+            case COMMAND_VOCAB_CVP:
                 {
                     rec = true;
                     reply.addString("constant");
                     if(nullptr!=rThread){
-                        if(command.size() == 3) {
-                          Bottle* finalB = command.get(2).asList();
-                          yDebug("bottle in threadInit %s", finalB->toString().c_str());
-                          if(rThread->factory("CVP", *finalB)) {
-                              ok = true;
-                          }
-                          }
+                        Bottle* params = command.get(2).asList();
+                        if(rThread->factory("CVP",*params)) {
+                            ok = true;
+                        }
                     }
                 }
             break;
@@ -840,7 +787,6 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                     rec = true;
                     reply.addString("nonBioLaw");
                     if(nullptr!=rThread){
-                        //GEN TTPL (((-0.3 -0.0 0.1) (-0.3 -0.1 0.2) (-0.3 -0.1 0.0) (0.0 1.57 4.71) (0.1 0.1)))
                         if(command.size() == 3) {
                             Bottle* finalB = command.get(2).asList();
                             yDebug("bottle in threadInit %s", finalB->toString().c_str());
@@ -856,7 +802,6 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                     rec = true;
                     reply.addString("twoThirdPowerLaw");
                     if(nullptr!=rThread){
-                        //GEN TT (((-0.3 -0.0 0.1) (-0.3 -0.1 0.2) (-0.3 -0.1 0.0) (0.0 1.57 4.71) (0.1 0.1)))
                         if(command.size() == 3) {
                             Bottle* finalB = command.get(2).asList();
                             yDebug("bottle in threadInit %s", finalB->toString().c_str());
@@ -867,9 +812,6 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
                     }
                 }
                 break;
-
-            /* LATER: implement case COMMAND_VOCAB_MBA */
-
             default:
                 cout << "received an unknown request after GEN" << endl;
                 break;
@@ -878,9 +820,11 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
         break;
     }
     mutex.post();
+    // if the command is not recognized, return reply with ""
     if (!rec){
         ok = RFModule::respond(command,reply);
     }
+    // check if the command was executed
     if (!ok) {
         reply.clear();
         reply.addVocab32(COMMAND_VOCAB_FAILED);
@@ -888,7 +832,6 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
     else{
         reply.addVocab32(COMMAND_VOCAB_OK);
     }
-
     return ok;
 }
 

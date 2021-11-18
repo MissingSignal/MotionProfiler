@@ -90,7 +90,7 @@ MotionProfile::~MotionProfile(){
 
 Vector MotionProfile::InitializeParameters(const Bottle *b){
   ResourceFinder rf;
-  rf.setVerbose(true);
+  rf.setVerbose(false);
 
   const int argc = 20;
   string stringArray[argc];
@@ -109,29 +109,28 @@ Vector MotionProfile::InitializeParameters(const Bottle *b){
   }
 
   // configuring the resource finder
-  rf.configure(b->size() * 2 + 1, argv);
+  //rf.configure(b->size() * 2 + 1, argv);
+  rf.configure(argc, argv,false);
+
   // visiting the parameters using the RF
   Vector Ovector(3);
   Vector Avector(3);
   Vector Bvector(3);
 
-  yInfo("--------------------------------------------------------------------------"); //for clarity
 
   string Ostring = rf.check("O",
                          Value("-0.3 -0.1 0.1"),
                          "position O (string)").asString();
   extractVector(Ostring, Ovector);
-  yInfo("got O value %s [m]", Ovector.toString().c_str());
+
   string Astring = rf.check("A",
                          Value("-0.3 0.0 0.1"),
                          "position A (string)").asString();
   extractVector(Astring, Avector);
-  yInfo("got A value %s [m]", Avector.toString().c_str());
   string Bstring = rf.check("B",
                          Value("-0.3 -0.1 0.3"),
                          "position B (string)").asString();
   extractVector(Bstring, Bvector);
-  yInfo("got B value %s [m]", Bvector.toString().c_str());
 
   // TO DO: Si puo ripulire, calcoliamolo in setAxes @LUCA
   Vector axisVector(2);
@@ -148,16 +147,22 @@ Vector MotionProfile::InitializeParameters(const Bottle *b){
   string  paramString = rf.check("param",
                          Value("0.1"),
                          "parameters (string)").asString();
+  Vector paramVector;
 
-  //read the number of velocity points (I don't like this implementation) @Luca
-  std::stringstream  stream(paramString);
-  unsigned int vel_length = 1;
-  string space = " ";
-  while(stream >> space) { ++vel_length;}
-  ///////////////////////////////////////////////////////////////////////////
+  //if we have only 1 param the string is read as empty, this is an ugly fix @Luca
+  if(paramString.empty()){
+      paramVector.push_back(rf.find("param").asFloat32());
+  }
+  else{
+      double value;
+      std::stringstream stream(paramString);
+      while (stream >> value){
+          paramVector.push_back(value);
+      }
+  }
 
-  Vector paramVector(vel_length);
-  extractVector(paramString, paramVector);
+  //print paramVector
+
   bool reverse = rf.check("rev");
 
   // set parameters
@@ -171,7 +176,24 @@ Vector MotionProfile::InitializeParameters(const Bottle *b){
   setReverse(reverse);
   setStartStop(thetaVector[0], thetaVector[1]);
 
-  yInfo("--------------------------------------------------------------------------"); //for clarity
+
+
+    cout << ("\n--------------------------------------------------------------------------\n"); //for clarity
+    yInfo("got O value       :      [m] %s", O.toString().c_str());
+    yInfo("got A value       :      [m] %s",  A.toString().c_str());
+    yInfo("got B value       :      [m] %s",  B.toString().c_str());
+    yInfo("got C value       :      [m] %s (inferred)", C.toString().c_str());
+    yInfo("got D value       :      [m] %s (inferred)", C.toString().c_str());
+    yInfo("got theta start   :      [rad] %f", theta_start);
+    yInfo("got theta stop    :      [rad] %f", theta_stop);
+    if (reverseSign==-1){
+        yInfo("got reverse       :      [bool] true");
+    }
+    else{
+        yInfo("got reverse       :      [bool] false");
+    }
+    yInfo("parameters        :      %s", paramVector.toString().c_str());
+  cout << ("--------------------------------------------------------------------------\n\n"); //for clarity
 
   return paramVector;
 }
@@ -190,17 +212,12 @@ void MotionProfile::setCenter(Vector _O){
 }
 
 void MotionProfile::setStartStop(const double t_start, const double t_stop){
-    yInfo("got THETA_start : %f (rad)", t_start);
-    yInfo("got THETA_stop  : %f (rad)", t_stop);
 
     if(reverseSign == -1) {
-      yInfo("reverse motion: ON");
       theta_start = t_stop;
       theta_stop = t_start;
-      yInfo("I will go from %f (rad) to %f (rad)", theta_start, theta_stop);
     }
     else {
-      yInfo("reverse motion: OFF");
       theta_start = t_start;
       theta_stop = t_stop;
     }
@@ -256,13 +273,11 @@ void MotionProfile::setViaPoints(const Vector _A, const Vector _B){
     C[0] = O[0] + xAxis * -1 * AOnorm[0] ;
     C[1] = O[1] + xAxis * -1 * AOnorm[1] ;
     C[2] = O[2] + xAxis * -1 * AOnorm[2] ;
-    yInfo("got C value %s [m] (automatically evaluated)", C.toString().c_str());
 
     // POINT D is automatically evaluated
     D[0] = O[0] + yAxis * -1 * BOnorm[0];
     D[1] = O[1] + yAxis * -1 * BOnorm[1];
     D[2] = O[2] + yAxis * -1 * BOnorm[2];
-    yInfo("got D value %s [m] (automatically evaluated)", D.toString().c_str());
 }
 
 void MotionProfile::setAxes(const double _xAxis,const double _yAxis){
@@ -336,11 +351,10 @@ Vector MotionProfile::getInitial(){
     locInitial[0]=O[0] + radius * cos(theta_start) * AOnorm[0] + radius * sin(theta_start) * BOnorm[0];
     locInitial[1]=O[1] + radius * cos(theta_start) * AOnorm[1] + radius * sin(theta_start) * BOnorm[1];
     locInitial[2]=O[2] + radius * cos(theta_start) * AOnorm[2] + radius * sin(theta_start) * BOnorm[2];
-    yInfo("getting the initial position %s for thetaStart %f with radius %f", locInitial.toString().c_str(), theta_start, radius);
     return locInitial;
 }
 
-bool MotionProfile::inRange(double theta) const{
+bool MotionProfile::inRange(double angle) const{
     //reverseSign = 1 when reverse = FALSE
     if(reverseSign == 1) {
         if((theta >= theta_start) && (theta <= theta_stop))
@@ -356,80 +370,6 @@ bool MotionProfile::inRange(double theta) const{
             return false;
     }
 }
-
-//Matrix MotionProfile::offline_compute(yarp::dev::ICartesianControl *icart) {
-//
-//    //IEncoders *enc;
-//    //robotDevice.view(enc);
-//
-//    int n_joints = 17; //TO DO to be read
-//    const float delta_time = 0.01;
-//    double thetaStart = 0;
-//    angVelocity = 0;
-//    int step_counter = 0;
-//    theta = 0;
-//    thetaPrev = 0;
-//
-//    // hand pose and orientation, final(hat) may differ from the commanded desired
-//    yarp::sig::Vector xd(3),xd_final(3),od(4),od_final(4);
-//
-//    // joints configuration
-//    yarp::sig::Vector q_start,q_final;
-//
-//    // Trajectory, matrix containing the joints config at each time step
-//    yarp::sig::Matrix trajectory(velocityProfile.size(),n_joints);
-//
-//    yInfo("velocityProfile = %li", velocityProfile.size());
-//    //get actual starting pose [CARTESIAN]
-//    icart->getPose(xd,od);
-//    //get actual starting pose q_start [JOINTS]
-//    icart->getDesired(xd,od,q_start);
-//
-//
-//    //Vector xdes = *xd; //perchè dichiarato qui ? @Luca
-//
-//    while(inRange(theta)){
-//
-//        yDebug("****************** STEP %i/%li **********************", step_counter, velocityProfile.size());
-//
-//        //read the desired velocity
-//        tanVelocity = velocityProfile[step_counter];
-//        //knowing the angle theta, evaluate radius
-//        radius = computeRadius(theta);
-//        //convert tangential velocty to angular velocity
-//        angVelocity = tanVelocity / radius;
-//        //compute the angle of the next point to reach
-//        theta =  thetaPrev + reverseSign * (delta_time) * angVelocity;
-//
-//        // evaluate the corresponding cartesian point of the trajectory
-//        (xd)[0] = O[0] + radius * cos(theta) * AOnorm[0] + radius * sin(theta) * BOnorm[0];
-//        (xd)[1] = O[1] + radius * cos(theta) * AOnorm[1] + radius * sin(theta) * BOnorm[1];
-//        (xd)[2] = O[2] + radius * cos(theta) * AOnorm[2] + radius * sin(theta) * BOnorm[2];
-//
-//        //ask the solver to compute the joint angles that allow to reach that position
-//        //note that the solver takes into account the prevoious position of the robot
-//        icart->askForPose(q_start,xd,od,xd_final,od_final,q_final);
-//        //starting joint position, CART desired pos+ori, CART target pos+ori, final joint config.
-//
-//        //add q_final to the trajectory as row
-//        trajectory.setRow(step_counter, q_final);
-//
-//        yInfo("xdes %s", xd.toString().c_str());
-//
-//        // update the variables
-//        radiusPrev = radius;
-//        thetaPrev  = theta;
-//        //xPrev      = (*xd);
-//        q_start = q_final;
-//        step_counter++;
-//    }
-//
-//    return trajectory;
-//    //yDebug("STEP = %i/%li", step_counter, velocityProfile.size());
-//    //yDebug("TRAVELLED DISTANCE = %f", eval_distance(*xd, xPrev));
-//    //yDebug("ESTIMATED VELOCITY (@LUCA) = %f", eval_distance(*xd, xPrev)/(t-tprev));
-//
-//}
 
 //***********************************************************************************************************************
 
@@ -491,6 +431,7 @@ CVMotionProfile::CVMotionProfile(const Bottle& bInit){
     //read all the parameters and return the custom parameters that are specific for this class
     yarp::sig::Vector paramVector = InitializeParameters(b);
     setVelocity(paramVector[0]);
+    cout << "Constant Velocity Profile: vel = " << paramVector[0] << endl;
 }
 
 bool CVMotionProfile::operator==(const CVMotionProfile &cvmp){
@@ -508,9 +449,8 @@ void CVMotionProfile::preComputation(const double t, const double theta){
     yInfo("computed radius %f [m] for tangVelocity %f [m/s]", radius, tanVelocity);
     // computing angular velocity in function of the radius, theta, tangential velocity
     //angVelocity = computeAngVelocity(theta);
-    cout << "The constant velocity is set at: " << tanVelocity;
+    yInfo("The constant velocity is set at: %f", tanVelocity);
     angVelocity = tanVelocity / radius;
-
 
     yInfo("computed angular velocity %f in rad/s", angVelocity);
     double tanVelocity_temp = checkTanVelocity(theta);
@@ -520,7 +460,7 @@ void CVMotionProfile::preComputation(const double t, const double theta){
 }
 
 Vector* CVMotionProfile::compute(double t){
-    const float delta_time = 0.01;
+    const float delta_time = 0.1;
 
     double thetaStart;
     if(t-t0 == 0) {
@@ -529,10 +469,13 @@ Vector* CVMotionProfile::compute(double t){
     }
     else {
         while (t-tprev < delta_time && t-t0 != 0){t=Time::now();} //wait the end of the time step
-        cout << "updating theta" << endl;
-        cout << "t-tprev " << t-tprev << endl;
-        cout << "angvelocity " << angVelocity << endl;
-        theta =  thetaPrev + reverseSign * (t - tprev) * angVelocity;
+        yDebug("DELTA_TIME = %f [s]", t-tprev);
+
+        yDebug("theta = %f + %i * (%f - %f) * %f ", thetaPrev,reverseSign,t,tprev,angVelocity);
+        yDebug("theta =  thetaPrev + reverseSign * t-tprev * angVelocity;");
+
+        theta =  thetaPrev + reverseSign * delta_time * angVelocity;
+        yDebug("next theta = %f", theta);
     }
 
     Vector xdes = *xd;
@@ -542,24 +485,17 @@ Vector* CVMotionProfile::compute(double t){
         (*xd)[0]=O[0] + radius * cos(theta) * AOnorm[0] + radius * sin(theta) * BOnorm[0];
         (*xd)[1]=O[1] + radius * cos(theta) * AOnorm[1] + radius * sin(theta) * BOnorm[1];
         (*xd)[2]=O[2] + radius * cos(theta) * AOnorm[2] + radius * sin(theta) * BOnorm[2];
-
-        yInfo("xdes %s", xd->toString().c_str());
     }
     else {
         return nullptr;
     }
 
-    Vector distance = (*xd) - xPrev;
-    yInfo("travelled distance x = %f , travelled distance y = %f absolute = %f", distance[1]/(t-tprev), distance[2]/(t-tprev),
-    sqrt(distance[1] * distance[1] + distance[2] * distance[2])/(t-tprev));
-
     // updating the previous incremental step values
-    radiusPrev =  radius;
-    thetaPrev = theta;
-    tprev     = t;
-    xPrev = (*xd);
+    radiusPrev = radius;
+    thetaPrev  = theta;
+    tprev      = t;
+    xPrev      = (*xd);
     return xd;
-
 }
 
 //***********************************************************************************************************************
@@ -621,92 +557,11 @@ TTPLMotionProfile::TTPLMotionProfile(const Bottle& bInit){
     radiusPrev = 0.1;
 
     Bottle* b = bInit.get(0).asList();
-    ResourceFinder rf;
-    rf.setVerbose(true);
-	//fix: max size would be 8 * 2 + 1; round it to 20 @amaroyo 18/01/2016
-  //int argc = b->size() * 2 + 1;   //@JONAS: made the argc variable 11/9/17
-	//fix:
-	  const int argc = 20;
-    string stringArray[argc];
-    char* argv[argc];
-    stringArray[0].append("./motionProfile");
-    argv[0] = (char*) stringArray[0].c_str();
-    yDebug("added first %s", argv[0]);
-
-    for (int j = 0; j < b->size(); j++) {
-        Bottle* vector = b->get(j).asList();
-        stringArray[j * 2 + 1].append("--");
-        //stringArray[j * 2 + 1].append("A");
-        stringArray[j * 2 + 1].append(vector->get(0).asString());
-        char temp[50];
-        yDebug("%f %f %f",vector->get(1).asFloat64(), vector->get(2).asFloat64(), vector->get(3).asFloat64());
-        sprintf(temp,"%f %f %f", vector->get(1).asFloat64(), vector->get(2).asFloat64(), vector->get(3).asFloat64());
-
-        stringArray[j * 2 + 2].append(&temp[0]);
-        yDebug("string: %s %s", stringArray[j * 2 + 1].c_str(), stringArray[j * 2 + 2].c_str());
-        argv[j * 2 + 1] = (char*) stringArray[j * 2 + 1].c_str();
-        argv[j * 2 + 2] = (char*) stringArray[j * 2 + 2].c_str();
-        yDebug("param %s", argv[j * 2 + 1]);
-        yDebug("value %s", argv[j * 2 + 2]);
-    }
-    yDebug("......");
-    yDebug("argc %d argv %s", argc, argv[0]);
-    // configuring the resource finder
-    rf.configure(argc, argv);
-
-    yInfo("resorceFinder: %s",rf.toString().c_str());
-    // visiting the parameters using the RF
-    Vector Ovector(3);
-    Vector Avector(3);
-    Vector Bvector(3);
-    string Ostring = rf.check("O",
-                           Value("-0.3 -0.1 0.1"),
-                           "position O (string)").asString();
-    extractVector(Ostring, Ovector);
-    yDebug("got O value %s", Ovector.toString().c_str());
-    string  Astring = rf.check("A",
-                           Value("-0.3 0.0 0.1"),
-                           "position A (string)").asString();
-    extractVector(Astring, Avector);
-    yDebug("got A value %s", Avector.toString().c_str());
-    string  Bstring = rf.check("B",
-                           Value("-0.3 -0.1 0.2"),
-                           "position B (string)").asString();
-    extractVector(Bstring, Bvector);
-    yDebug("got B value %s", Bvector.toString().c_str());
-    Vector thetaVector(2);
-    string  thetaString = rf.check("theta",
-                           Value("0 1.57"),
-                           "theta angles (string)").asString();
-    extractVector(thetaString, thetaVector);
-    yDebug("got THETA_START : %f (rad)", thetaVector[0]);
-    yDebug("got THETA_STOP  : %f (rad)", thetaVector[1]);
-    Vector axisVector(2);
-    string  axisString = rf.check("axes",
-                           Value("0.1 0.2"),
-                           "minor and major axes (string)").asString();
-    extractVector(axisString, axisVector);
-    yDebug("got minor and major axes:(%s)", axisVector.toString().c_str());
-    Vector paramVector(1);
-    string  paramString = rf.check("param",
-                           Value("0.1"),
-                           "profile parameters (string)").asString();
-    extractVector(paramString, paramVector);
-    yDebug("got profile parameters:(%s)", paramVector.toString().c_str());
-    bool reverse = rf.check("rev");
-
-    setCenter(Ovector);
-    setStartStop(thetaVector[0], thetaVector[1]);
-    setAxes(axisVector[0], axisVector[1]);
+    //read all the parameters and return the custom parameters that are specific for this class
+    yarp::sig::Vector paramVector = InitializeParameters(b);
     setGain(paramVector[0]);
     setBeta(paramVector[1]);
-    setReverse(reverse);
-
-    if(pointsAreReachable()) {
-      valid = true;
-      setViaPoints(Avector,Bvector);
-    }
-    else {yError("Error positions are not allowed!");}
+    cout << "TTPL Profile: gain = " << gain << " beta = " << beta << endl;
 }
 
 bool TTPLMotionProfile::operator==(const TTPLMotionProfile &ttplmp){
@@ -770,9 +625,6 @@ Vector* TTPLMotionProfile::compute(double t){
     if(inRange(theta)) {
         yInfo("In the range xAxis:%f yAxis:%f", xAxis,yAxis);
         preComputation(t, theta);
-        //(*xd)[0]=O[0] + xAxis * cos(theta) * AO[0] + yAxis * sin(theta) * BO[0];
-        //(*xd)[1]=O[1] + xAxis * cos(theta) * AO[1] + yAxis * sin(theta) * BO[1];
-        //(*xd)[2]=O[2] + xAxis * cos(theta) * AO[2] + yAxis * sin(theta) * BO[2];
         (*xd)[0]=O[0] + radius * cos(theta) * AOnorm[0] + radius * sin(theta) * BOnorm[0];
         (*xd)[1]=O[1] + radius * cos(theta) * AOnorm[1] + radius * sin(theta) * BOnorm[1];
         (*xd)[2]=O[2] + radius * cos(theta) * AOnorm[2] + radius * sin(theta) * BOnorm[2];
@@ -788,9 +640,9 @@ Vector* TTPLMotionProfile::compute(double t){
 
     // updating the previous incremental step values
     radiusPrev =  radius;
-    thetaPrev = theta;
-    tprev     = t;
-    xPrev = (*xd);
+    thetaPrev  = theta;
+    tprev      = t;
+    xPrev      = (*xd);
     return xd;
 }
 
@@ -852,93 +704,11 @@ TwoThirdMotionProfile::TwoThirdMotionProfile(const Bottle& bInit){
     radiusPrev = 0.1;
 
     Bottle* b = bInit.get(0).asList();
-    ResourceFinder rf;
-    rf.setVerbose(true);
-
-    const int argc = 20;
-    string stringArray[argc];
-    char* argv[argc];
-    stringArray[0].append("./motionProfile");
-    argv[0] = (char*) stringArray[0].c_str();
-    //yDebug("added first %s", argv[0]);
-    //yDebug("number of elements %d", b->size());
-
-    for (int j = 0; j < b->size(); j++) {
-        Bottle* vector = b->get(j).asList();
-        stringArray[j * 2 + 1].append("--");
-        //stringArray[j * 2 + 1].append("A");
-        stringArray[j * 2 + 1].append(vector->get(0).asString().c_str());
-        char temp[50];
-        //yDebug("%f %f %f",vector->get(1).asFloat64(), vector->get(2).asFloat64(), vector->get(3).asFloat64());
-        sprintf(temp,"%f %f %f", vector->get(1).asFloat64(), vector->get(2).asFloat64(), vector->get(3).asFloat64());
-
-        stringArray[j * 2 + 2].append(&temp[0]);
-        //yDebug("string: %s %s", stringArray[j * 2 + 1].c_str(), stringArray[j * 2 + 2].c_str());
-        argv[j * 2 + 1] = (char*) stringArray[j * 2 + 1].c_str();
-        argv[j * 2 + 2] = (char*) stringArray[j * 2 + 2].c_str();
-        //yDebug("param %d %s",j , argv[j * 2 + 1]);
-        //yDebug("value %s", argv[j * 2 + 2]);
-    }
-    yDebug("......");
-    //yDebug("argc %d argv %s", b->size(), argv[0]);
-    //for (int j = 0; j < b->size() * 2 + 1; j++) {
-        //yDebug("argv %s", argv[j]);
-    //}
-    // configuring the resource finder
-    yDebug("success %d", rf.configure(b->size() * 2 + 1, argv));
-
-    yInfo("resorceFinder: %s",rf.toString().c_str());
-    // visiting the parameters using the RF
-    Vector Ovector(3);
-    Vector Avector(3);
-    Vector Bvector(3);
-    string Ostring = rf.check("O",
-                           Value("-0.3 -0.1 0.1"),
-                           "position O (string)").asString();
-    extractVector(Ostring, Ovector);
-    yDebug("got O value %s", Ovector.toString().c_str());
-    string  Astring = rf.check("A",
-                           Value("-0.3 0.0 0.1"),
-                           "position A (string)").asString();
-    extractVector(Astring, Avector);
-    yDebug("got A value %s", Avector.toString().c_str());
-    string  Bstring = rf.check("B",
-                           Value("-0.3 -0.1 0.2"),
-                           "position B (string)").asString();
-    extractVector(Bstring, Bvector);
-    yDebug("got B value %s", Bvector.toString().c_str());
-    // TO DO: Si puo ripulire, calcoliamolo in setAxes @LUCA
-    Vector axisVector(2);
-    axisVector[0] = eval_distance(Avector,Ovector); //AO Axis
-    axisVector[1] = eval_distance(Bvector,Ovector); //BO Axis
-
-    Vector thetaVector(2);
-    string  thetaString = rf.check("theta",
-                           Value("0 6.28"),
-                           "theta angles (string)").asString();
-    extractVector(thetaString, thetaVector);
-    yDebug("got THETA_START : %f (rad)", thetaVector[0]);
-    yDebug("got THETA_STOP  : %f (rad)", thetaVector[1]);
-    Vector paramVector(1);
-    string  paramString = rf.check("param",
-                           Value("0.1"),
-                           "profile parameters (string)").asString();
-    extractVector(paramString, paramVector);
-    yDebug("got profile parameters:(%s)", paramVector.toString().c_str());
-    bool reverse = rf.check("rev");
-
-    setCenter(Ovector);
-    setStartStop(thetaVector[0], thetaVector[1]);
-    setAxes(axisVector[0], axisVector[1]);
+    //read all the parameters and return the custom parameters that are specific for this class
+    yarp::sig::Vector paramVector = InitializeParameters(b);
     setGain(paramVector[0]);
     setBeta(paramVector[1]);
-    setReverse(reverse);
-
-    if(pointsAreReachable()) {
-      valid = true;
-      setViaPoints(Avector,Bvector);
-    }
-    else {yError("Error positions are not allowed!");}
+    cout << "Two Third Motion Profile: gain = " << gain << " beta = " << beta << endl;
 }
 
 bool TwoThirdMotionProfile::operator==(const TwoThirdMotionProfile &ttplmp){
@@ -1182,85 +952,11 @@ MJMotionProfile::MJMotionProfile(const Bottle& bInit){
   radiusPrev = 0.1;
 
   Bottle* b = bInit.get(0).asList();
-  yDebug("Analyzing the list of vectors from bottle b:%s", b->toString().c_str());
-  ResourceFinder rf;
-  rf.setVerbose(true);
-  //fix: max size would be 8 * 2 + 1; round it to 20 @amaroyo 18/01/2016
-  //int argc = b->size() * 2 + 1;
-  const int argc = 20;
-  string stringArray[argc];
-  char* argv[argc];
-  stringArray[0].append("./motionProfile");
-  argv[0] = (char*) stringArray[0].c_str();
-  yDebug("added the first %s", argv[0]);
-
-  for (int j = 0; j < b->size(); j++) {
-      Bottle* vector = b->get(j).asList();
-      stringArray[j * 2 + 1].append("--");
-      //stringArray[j * 2 + 1].append("A");
-      stringArray[j * 2 + 1].append(vector->get(0).asString().c_str());
-      char temp[50];
-      sprintf(temp,"%f %f %f", vector->get(1).asFloat64(), vector->get(2).asFloat64(), vector->get(3).asFloat64());
-      stringArray[j * 2 + 2].append(&temp[0]);
-      argv[j * 2 + 1] = (char*) stringArray[j * 2 + 1].c_str();
-      argv[j * 2 + 2] = (char*) stringArray[j * 2 + 2].c_str();
-      yDebug("param %s", argv[j * 2 + 1]);
-      yDebug("value %s", argv[j * 2 + 2]);
-  }
-  // configuring the resource finder
-  //rf.configure(argc, argv);
-  yDebug("success %d", rf.configure(b->size() * 2 + 1, argv));
-  // visiting the parameters using the RF
-  Vector Ovector(3);
-  Vector Avector(3);
-  Vector Bvector(3);
-  string Ostring = rf.check("O",
-                         Value("-0.3 -0.1 0.1"),
-                         "position O (string)").asString();
-  extractVector(Ostring, Ovector);
-  string  Astring = rf.check("A",
-                         Value("-0.3 0.0 -0.1"),
-                         "position A (string)").asString();
-  extractVector(Astring, Avector);
-  yDebug("got A value %s", Avector.toString().c_str());
-  string  Bstring = rf.check("B",
-                         Value("-0.3 0.0 -0.1"),
-                         "position B (string)").asString();
-  extractVector(Bstring, Bvector);
-  yDebug("got B value %s", Bvector.toString().c_str());
-  // TO DO: Si puo ripulire, calcoliamolo in setAxes @LUCA
-  Vector axisVector(2);
-  axisVector[0] = eval_distance(Avector,Ovector); //AO Axis
-  axisVector[1] = eval_distance(Bvector,Ovector); //BO Axis
-
-  Vector thetaVector(2);
-  string  thetaString = rf.check("theta",
-                         Value("0 6.28"),
-                         "theta angles (string)").asString();
-  extractVector(thetaString, thetaVector);
-  yDebug("got THETA_START : %f (rad)", thetaVector[0]);
-  yDebug("got THETA_STOP  : %f (rad)", thetaVector[1]);
-  Vector paramVector(1);
-  string  paramString = rf.check("param",
-                         Value("0.1"),
-                         "profile parameters (string)").asString();
-  extractVector(paramString, paramVector);
-  yDebug("got profile parameters:(%s)", paramVector.toString().c_str());
-  bool reverse = rf.check("rev");
-
-  setCenter(Ovector);
-  setStartStop(thetaVector[0], thetaVector[1]);
-  setAxes(axisVector[0], axisVector[1]);
+  //read all the parameters and return the custom parameters that are specific for this class
+  yarp::sig::Vector paramVector = InitializeParameters(b);
   setVelocity(paramVector[0]);
-  setReverse(reverse);
+  cout << "Minimum Jerk Profile: vel = " << paramVector[0] << endl;
 
-  if(pointsAreReachable()) {
-      valid = true;
-      setViaPoints(Avector,Bvector);
-  }
-  else {
-      yError("Error positions are not allowed!");
-  }
 }
 
 bool MJMotionProfile::operator==(const MJMotionProfile &cvmp){
@@ -1426,10 +1122,7 @@ GVPMotionProfile::GVPMotionProfile(const Bottle& bInit) {
   yarp::sig::Vector velVector = InitializeParameters(b);
 
   setVelocity(velVector); // set the velocity generic velocity profile, in  the other profiles this is a different parameter
-
-  yDebug("got Velocity vector of size: %li", velVector.size());
-  yDebug("The profile is: %s", velocityProfile.toString().c_str());
-  yInfo("Motion profile %s configured", type.c_str());
+  cout << "General Velocity Profile: velocity samples = " << velVector.size() << endl;
 }
 
 bool GVPMotionProfile::operator==(const GVPMotionProfile &gvmp){
@@ -1438,11 +1131,6 @@ bool GVPMotionProfile::operator==(const GVPMotionProfile &gvmp){
 
 void GVPMotionProfile::preComputation(const double t, const double theta){
 
-  //angular velocity expressed in frequency [Hz],
-  //e.g.: 0.1 => 1/10 of 2PI per second; 2PI in 10sec
-  //e.g.: 0.2 => 1/20 of 2PI per second; 2PI in 20sec
-  //ONLY FOR CIRCLES: angular velocity constant to obtain constant tang.velocity
-  //FOR ELLIPSE: compute angular velocity from A,B and desired tang.velocity
   radius = computeRadius(theta);
 
   yInfo("computed radius %f [m] for tangVelocity %f [m/s]", radius, tanVelocity);
@@ -1474,9 +1162,6 @@ void GVPMotionProfile::preComputation(const double t, const double theta){
   yInfo("desired  tang velocity %f in m/s", tanVelocity);
   yInfo("computed tang velocity %f in m/s", tanVelocity_temp);
 
-  //vel_luca.push_back(eval_distance(*xd, xPrev)/(t-tprev));
-
-  //double theta = 2.0 * M_PI * angVelocity * (t - t0);
   yInfo("theta angle [rad] %f", theta);
 }
 
@@ -1510,22 +1195,12 @@ Vector* GVPMotionProfile::compute(double t){
       yInfo("xdes %s", xd->toString().c_str());
   }
   else {
-      //movement shoud be finished
-      ////////////////////////////////////////////////////////////
-      //Save velocity file @luca
-//      yInfo("PRINTING REPORT ON FILE");
-//      std::ofstream myfile ("Velocity_Report.csv");
-//      myfile << ToSave.toString().c_str()<< std::endl;
-//      myfile << velocityProfile.toString().c_str()<<std::endl;
-//      myfile.close();
-      ////////////////////////////////////////////////////////////
       return nullptr;
   }
 
   //yDebug("STEP = %i/%li", step_counter, velocityProfile.size());
   yDebug("TRAVELLED DISTANCE = %f", eval_distance(*xd, xPrev));
   yDebug("ESTIMATED VELOCITY (@LUCA) = %f", eval_distance(*xd, xPrev)/(t-tprev));
-
 
   // updating the previous incremental step values
   radiusPrev = radius;

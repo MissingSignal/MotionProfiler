@@ -36,6 +36,7 @@
 #include <ctime>
 #include <cstdio>
 #include <cmath>
+#include <utility>
 
 #define minX_DF  -0.35;  // working space x
 #define maxX_DF  -0.20;  // working space x
@@ -152,9 +153,8 @@ public:
     * function that sets where the action should start and stop
     * @param thetaA angle of the starting point (in rad)
     * @param thetaB angle of the viapoint (in rad)
-    * @param thataC angle of the stop point (in rad)
     */
-    void setStartStop(const double theta_start, const double theta_stop);
+    void setStartStop(double theta_start, double theta_stop);
 
     /**
     * function to set the three via points in 3D space
@@ -164,12 +164,12 @@ public:
     /**
     * function to set the three via points in 3D space
     */
-    void setViaPoints(const yarp::sig::Vector A,const yarp::sig::Vector B);
+    void setViaPoints(yarp::sig::Vector A,yarp::sig::Vector B);
 
     /**
     * function to se the main axes of the ellipse that belong to the reference plane
     */
-    void setAxes(const double xAxis,const double yAxis);
+    void setAxes(double xAxis,double yAxis);
 
     /**
     * function returning the A vector
@@ -179,7 +179,7 @@ public:
     /**
     * function setting the A vector
     */
-    void setA(yarp::sig::Vector value) { A = value; };
+    void setA(yarp::sig::Vector value) { A = std::move(value); };
 
     /**
     * function returning the A vector
@@ -189,7 +189,7 @@ public:
     /**
     * function setting the A vector
     */
-    void setB(yarp::sig::Vector value) { B = value; };
+    void setB(yarp::sig::Vector value) { B = std::move(value); };
 
     /**
     * function returning the B vector
@@ -199,22 +199,22 @@ public:
     /**
     * function setting the C vector
     */
-    void setC(yarp::sig::Vector value) { C = value; };
+    void setC(yarp::sig::Vector value) { C = std::move(value); };
 
 		/**
 		* function setting the D vector
 		*/
-		void setD(yarp::sig::Vector value) { D = value; };
+		void setD(yarp::sig::Vector value) { D = std::move(value); };
 
     /**
     * function returning the C vector
     */
     yarp::sig::Vector getC() { return C; };
 
-		/**
-		* function returning the D vector
-		*/
-		yarp::sig::Vector getD() { return D; };
+    /**
+    * function returning the D vector
+    */
+    yarp::sig::Vector getD() { return D; };
 
     /**
      * function that returs the initial position of the traj.
@@ -224,12 +224,12 @@ public:
     /**
      * function that returs the initial position of the traj.
      */
-    double  getTanVelocity() {return tanVelocity; };
+    double  getTanVelocity() const {return tanVelocity; };
 
     /**
      * function that returns the curvature
      */
-    double getCurvature() {return k;};
+    double getCurvature() const {return k;};
 
     /**
      * function that returns the angVelocity
@@ -239,29 +239,29 @@ public:
     /**
      * function that returns the radius
      */
-    double getRadius() {return r;};
+    double getRadius() const {return r;};
 
     /**
     * function that return the vector with module equal to the radius
     */
-    yarp::sig::Vector normalizeVector(const yarp::sig::Vector u, double const radius);
+    yarp::sig::Vector normalizeVector(yarp::sig::Vector u, double radius);
 
     /**
     * function that computes the angular velocity given desired tang.Velocity, xAxis and yAxis
     */
-    double computeAngVelocity(const double theta);
+    double computeAngVelocity(double theta);
 
     /**
     * function that computes the tangential velocity given desired ang.Velocity, xAxis and yAxis
     */
-    double checkTanVelocity(const double theta);
+    double checkTanVelocity(double theta);
 
     /**
     * function that computed the radius in ellipse give a theta angle
     * @param theta angle at which the radius is computed [rad]
     * @return radius of the ellipse/circle at a given angle theta
     */
-    virtual double computeRadius(const double theta);
+    virtual double computeRadius(double theta);
 
     /**
     * function that checks if all the points belong to the reaching space
@@ -272,12 +272,12 @@ public:
      * function that return whether the theta angle is in the execution range
      *
      */
-    bool inRange(const double theta) const;
+    bool inRange(double angle) const;
 
     /**
     * function preparing the relevant set of variable used in the computation
     */
-    virtual void preComputation(const double t, const double theta) = 0;
+    virtual void preComputation(double t, double theta) = 0;
 
     /**
     * vector returning the 3D location at the instant t
@@ -307,7 +307,7 @@ public:
     * function that sets the desired tangential velocity of the endEffector
     */
     void setVelocity(const double vel) {tanVelocity = vel;};
-    void preComputation(const double t, const double theta);
+    void preComputation(double t, double theta);
     yarp::sig::Vector* compute(double t);
 };
 

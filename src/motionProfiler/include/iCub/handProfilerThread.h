@@ -43,8 +43,6 @@
 class handProfilerThread : public yarp::os::RateThread,  public yarp::dev::CartesianEvent{
 protected:
 
-    static yarp::sig::Vector xZero;
-
     int icartContext;
     int count;                     // counter for execution cycles
     int fileCounter;               // counter for file naming
@@ -135,7 +133,7 @@ protected:
     std::ofstream infoOutputFile;                                 // file in which to save info about the movement
     std::ifstream inputFile;                                      // file to read joint positions from
     std::ifstream infoInputFile;                                  // file to read with info about the movement
-    enum States {none, simulation, execution, file, home};              // states for the controller
+    enum States {none, simulation, execution, file};        // states for the controller
     States state;
     yarp::os::Stamp* timestamp;                                   // timestamp for saving to file
 
