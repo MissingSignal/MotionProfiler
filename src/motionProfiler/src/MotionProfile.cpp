@@ -45,7 +45,7 @@ inline void extractVector(const string str, Vector& res){
 inline double eval_distance(const Vector Point1, const Vector Point2){
 
   double x = Point1[1] - Point2[1];
-	double y = Point1[2] - Point2[2];
+  double y = Point1[2] - Point2[2];
   double z = Point1[3] - Point2[3];
 
 	double dist;
@@ -574,7 +574,7 @@ double TTPLMotionProfile::computeTangVelocity(){
     double reBeta = -1 * beta;
     double curvature = 1 / radius;
     double vel = gain * pow(curvature, reBeta);
-    yInfo("ComputeTangVelocity: beta= %fcurvature=%f tan.vel=%f", beta, curvature, vel);
+    yInfo("ComputeTangVelocity: beta= %f curvature=%f tan.vel=%f", beta, curvature, vel);
     return vel;
 }
 
@@ -611,11 +611,9 @@ void TTPLMotionProfile::preComputation(const double  t, const double theta){
 }
 
 Vector* TTPLMotionProfile::compute(double t){
-    double thetaStart;
 
     if(t-t0 == 0) {
         theta = theta_start;
-        thetaStart =  theta_start;
     }
     else {
         theta =  thetaPrev + reverseSign * (t - tprev) * angVelocity;
@@ -623,7 +621,6 @@ Vector* TTPLMotionProfile::compute(double t){
 
     Vector xdes = *xd;
     if(inRange(theta)) {
-        yInfo("In the range xAxis:%f yAxis:%f", xAxis,yAxis);
         preComputation(t, theta);
         (*xd)[0]=O[0] + radius * cos(theta) * AOnorm[0] + radius * sin(theta) * BOnorm[0];
         (*xd)[1]=O[1] + radius * cos(theta) * AOnorm[1] + radius * sin(theta) * BOnorm[1];
@@ -639,7 +636,7 @@ Vector* TTPLMotionProfile::compute(double t){
     sqrt(distance[1] * distance[1] + distance[2] * distance[2])/(t-tprev));
 
     // updating the previous incremental step values
-    radiusPrev =  radius;
+    radiusPrev = radius;
     thetaPrev  = theta;
     tprev      = t;
     xPrev      = (*xd);
@@ -742,9 +739,7 @@ double TwoThirdMotionProfile::computeCurvature(const double timeDiff, const doub
     //yDebug("xcur:%s", xcur.toString().c_str());
     //yDebug("xprev:%s", xprev->toString().c_str());
 
-    xder1prev[0] = (*xder1)[0];
-    xder1prev[1] = (*xder1)[1];
-    xder1prev[2] = (*xder1)[2];
+    xder1prev = (*xder1);
 
     //yDebug("saved the previous derivative");
 
@@ -775,55 +770,20 @@ double TwoThirdMotionProfile::computeCurvature(const double timeDiff, const doub
     double k = e / d;
     //yDebug("curvature = %f", k);
 
-    ///////////////// Fabio
-    //if (dataPort.getOutputCount()) {
-        Bottle& dataBottle = dataPort.prepare();
-        dataBottle.clear();
-        dataBottle.addFloat64(xcur[0]); dataBottle.addFloat64(xcur[1]); dataBottle.addFloat64(xcur[2]); //position
-        dataBottle.addFloat64((*xder1)[0]); dataBottle.addFloat64((*xder1)[1]); dataBottle.addFloat64((*xder1)[2]); //velocity
-        dataBottle.addFloat64( xder2[0]); dataBottle.addFloat64( xder2[1]); dataBottle.addFloat64( xder2[2]); //acceleration
-        dataBottle.addFloat64(d); dataBottle.addFloat64(e); dataBottle.addFloat64(k); //d, e, k
-
-        //dataPort.setEnvelope(ts);
-        dataPort.write();
-    //}
-    ///////////////////////////
     return k;
 }
 
 void TwoThirdMotionProfile::preComputation(const double  t, const double theta){
-    //angular velocity expressed in frequency [Hz],
-    //e.g.: 0.1 => 1/10 of 2PI per second; 2PI in 10sec
-    //e.g.: 0.2 => 1/20 of 2PI per second; 2PI in 20sec
-    //ONLY FOR CIRCLES: angular veloc.090001	 0.099486
 
-    //FOR ELLIPSE: compute angular velocity from A,B and desired tang.velocity
     radius = computeRadius(theta);
-    /*
-    double rDiff2     = (radius - radiusPrev) * (radius-radiusPrev);
-    double thetaDiff2 = (theta  - thetaPrev) * (theta - thetaPrev);
-    double sDiff2     = rDiff2  + (radius * radius) * thetaDiff2;
-    yInfo("rDiff2 %f thetaDiff2 %f radius %f sDiff %f", rDiff2, thetaDiff2, radius, sqrt(sDiff2));
-    */
 
-    /*
-    double drdtheta   = (radius - radiusPrev) / (theta - thetaPrev);
-    double drdtheta2  =  drdtheta * drdtheta;
-    double v2         = (drdtheta2 + (radius * radius)) * (angVelocity * angVelocity);
-    yInfo("v %f", sqrt(v2));
-    */
     tanVelocity = computeTangVelocity();
-    //yDebug("TT:computed radius %f [m] for tangVelocity %f [m/s]", radius, tanVelocity);
-    // computing angular velocity in function of the radius, theta, tangential velocity
-    angVelocity = computeAngVelocity(theta);
-    double newAngVelocity = computeAngVelFabio();
-    angVelocity = newAngVelocity;
-    //yDebug("-----------old: %f ---------new: %f", angVelocity, newAngVelocity);
-    //yDebug("TT:computed angular velocity %f in rad/s", angVelocity);
+
+    //this is the major change in the computation of the curvature
+    angVelocity = computeAngVelFabio();
+
     double tanVelocity_temp = checkTanVelocity(theta);
-    //yDebug("TT:computed tangVelocity %f k %f r %f", tanVelocity, k, radius);
-    //double theta = 2.0 * M_PI * angVelocity * (t - t0);
-    //yDebug("TT:theta angle [rad] %f", theta);
+
 }
 
 double TwoThirdMotionProfile::computeAngVelFabio(){
@@ -833,29 +793,30 @@ double TwoThirdMotionProfile::computeAngVelFabio(){
 }
 
 Vector* TwoThirdMotionProfile::compute(double t){
-    double thetaStart;
     double timeDiff = t - tprev;
 
     Vector xdes = *xd;
-    if(firstCompute) {
-        xPrev[0]=O[0] + radius * cos(theta) * AOnorm[0] + radius * sin(theta) * BOnorm[0];
-        xPrev[1]=O[1] + radius * cos(theta) * AOnorm[1] + radius * sin(theta) * BOnorm[1];
-        xPrev[2]=O[2] + radius * cos(theta) * AOnorm[2] + radius * sin(theta) * BOnorm[2];
-
-        firstCompute = false;
-    }
-
 
     if(t-t0 == 0) {
+        //read starting pose
+        xPrev[0]=O[0] + radius * cos(theta_start) * AOnorm[0] + radius * sin(theta_start) * BOnorm[0];
+        xPrev[1]=O[1] + radius * cos(theta_start) * AOnorm[1] + radius * sin(theta_start) * BOnorm[1];
+        xPrev[2]=O[2] + radius * cos(theta_start) * AOnorm[2] + radius * sin(theta_start) * BOnorm[2];
         //yDebug("initial condition of t-t0 = 0");
         theta = theta_start;
-        thetaStart =  theta_start;
         k = 100;
         timeDiff = 0.05;
         // yDebug("timeDiff: %f", timeDiff);
     }
     else {
+        //while (t-tprev < 0.05){} //wait the end of the time step
+        yDebug("DELTA_TIME = %f [s]", t-tprev);
+
         theta =  thetaPrev + reverseSign * timeDiff * angVelocity;
+        cout << "time Diff: " << timeDiff << endl;
+        cout << "theta: " << theta << endl;
+        cout << "thetaPrev: " << thetaPrev << endl;
+        cout << "angVelocity: " << angVelocity << endl;
     }
     //yDebug("pre-computing %f with tanVelocity %f", theta, tanVelocity);
     //preComputation(t, theta);
@@ -863,24 +824,17 @@ Vector* TwoThirdMotionProfile::compute(double t){
     if (inRange(theta)) {
         // setting the attribute of the class k(curvature)
         k = computeCurvature(timeDiff ,thetaPrev,  &xPrev);
-        //yDebug("Computed Curvature: %f", k);
-        //yInfo("In the range xAxis:%f yAxis:%f", xAxis,yAxis);
+        yDebug("Computed Curvature: %f", k);
         preComputation(t, theta);
-        //(*xd)[0]=O[0] + xAxis * cos(theta) * AO[0] + yAxis * sin(theta) * BO[0];
-        //(*xd)[1]=O[1] + xAxis * cos(theta) * AO[1] + yAxis * sin(theta) * BO[1];
-        //(*xd)[2]=O[2] + xAxis * cos(theta) * AO[2] + yAxis * sin(theta) * BO[2];
+
         (*xd)[0]=O[0] + radius * cos(theta) * AOnorm[0] + radius * sin(theta) * BOnorm[0];
         (*xd)[1]=O[1] + radius * cos(theta) * AOnorm[1] + radius * sin(theta) * BOnorm[1];
         (*xd)[2]=O[2] + radius * cos(theta) * AOnorm[2] + radius * sin(theta) * BOnorm[2];
-        //yInfo("xdes %s", xd->toString().c_str());
-        (*xprev)[0] = (*xd)[0];
-        (*xprev)[1] = (*xd)[1];
-        (*xprev)[2] = (*xd)[2];
+        yInfo("xdes %s", xd->toString().c_str());
     }
     else {
         return NULL;
     }
-
 
     Vector distance = (*xd) - xPrev;
     //yInfo("TT:travelled distance x = %f , travelled distance y = %f absolute = %f", distance[1]/(t-tprev), distance[2]/(t-tprev),
@@ -888,9 +842,9 @@ Vector* TwoThirdMotionProfile::compute(double t){
 
     // updating the previous incremental step values
     radiusPrev =  radius;
-    thetaPrev = theta;
-    tprev     = t;
-    xPrev = (*xd);
+    thetaPrev  = theta;
+    tprev      = t;
+    xPrev      = (*xd);
 
     return xd;
 }
@@ -954,8 +908,9 @@ MJMotionProfile::MJMotionProfile(const Bottle& bInit){
   Bottle* b = bInit.get(0).asList();
   //read all the parameters and return the custom parameters that are specific for this class
   yarp::sig::Vector paramVector = InitializeParameters(b);
-  setVelocity(paramVector[0]);
-  cout << "Minimum Jerk Profile: vel = " << paramVector[0] << endl;
+  // in the final implementation the param vector will contain the execution time (seconds)
+  cout << "Minimum Jerk Profile:" << endl;
+  yDebug("WARNING! this profile is not yet implemented, it fixes theta_end = 1.57 rad (90°) and execution time = 5 seconds");
 
 }
 
@@ -967,7 +922,7 @@ double MJMotionProfile::computeTangVelocity(const double t){
   //v = g * K ^ (-beta);    beta = 0.33;
   //double reBeta = -1 * beta;
   //double curvature = 1 / radius;
-  thetaGoal = 1.57;
+  thetaGoal = 1.57; //theta Goal is fixed, we should change it to a parameter
   double goalRadius = computeRadius(thetaGoal);
   Vector goal(3);
   goal[0]=O[0] + goalRadius * cos(thetaGoal) * AOnorm[0] + goalRadius * sin(thetaGoal) * BOnorm[0];
@@ -975,7 +930,7 @@ double MJMotionProfile::computeTangVelocity(const double t){
   goal[2]=O[2] + goalRadius * cos(thetaGoal) * AOnorm[2] + goalRadius * sin(thetaGoal) * BOnorm[2];
   Vector distanceVect = goal - (*xd);
   //yDebug("distanceVector: %s", distanceVect.toString().c_str());
-  double distance = sqrt(distanceVect[0] * distanceVect[0] + distanceVect[1] * distanceVect[1] + distanceVect[2] * distanceVect[2]);
+  double distance = sqrt(pow(distanceVect[0],2) + pow(distanceVect[1],2) + pow(distanceVect[2],2));
   //yDebug("distance:%f", distance);
   double epsilon = (t - t0) / (tfinal - t0);
   //yDebug("epsilon:%f t:%f tfinal:%f", epsilon, t, tfinal);
@@ -1007,34 +962,16 @@ void MJMotionProfile::preComputation(const double t, const double theta){
 Vector* MJMotionProfile::compute(double t){
     if(t-t0 == 0) {
         theta = theta_start;
-        tfinal = t0 + 5.0;
+        tfinal = t0 + 5.0; //execution time is fixed, we should make it a parameter @Luca
     }
     else {
         theta =  thetaPrev + (t - tprev) * angVelocity;
     }
 
     Vector xdes = *xd;
-    if(theta == theta_start) {
-        yInfo("theta=theta_start check");
-        preComputation(t,theta);
-        //(*xd)[0]=O[0] + xAxis * cos(theta) * AO[0] + yAxis * sin(theta) * BO[0];
-        //(*xd)[1]=O[1] + xAxis * cos(theta) * AO[1] + yAxis * sin(theta) * BO[1];
-        //(*xd)[2]=O[2] + xAxis * cos(theta) * AO[2] + yAxis * sin(theta) * BO[2];
-        (*xd)[0]=O[0] + radius * cos(theta) * AOnorm[0] + radius * sin(theta) * BOnorm[0];
-        (*xd)[1]=O[1] + radius * cos(theta) * AOnorm[1] + radius * sin(theta) * BOnorm[1];
-        (*xd)[2]=O[2] + radius * cos(theta) * AOnorm[2] + radius * sin(theta) * BOnorm[2];
-        if( ((*xd)[0]!=A[0]) || ((*xd)[1]!=A[1]) || ((*xd)[2]!=A[2]) ){
-            yInfo("Beware: difference between desired location A and computed position!");
-            yInfo("vector xdes: %s", xd->toString().c_str());
-            //Time::delay(5.0);
-        }
-    }
-    else if ((theta > theta_start) && (theta<=theta_stop)) {
-        yInfo("In the range xAxis:%f yAxis:%f", xAxis,yAxis);
+
+    if (inRange(theta)) {
         preComputation(t, theta);
-        //(*xd)[0]=O[0] + xAxis * cos(theta) * AO[0] + yAxis * sin(theta) * BO[0];
-        //(*xd)[1]=O[1] + xAxis * cos(theta) * AO[1] + yAxis * sin(theta) * BO[1];
-        //(*xd)[2]=O[2] + xAxis * cos(theta) * AO[2] + yAxis * sin(theta) * BO[2];
         (*xd)[0]=O[0] + radius * cos(theta) * AOnorm[0] + radius * sin(theta) * BOnorm[0];
         (*xd)[1]=O[1] + radius * cos(theta) * AOnorm[1] + radius * sin(theta) * BOnorm[1];
         (*xd)[2]=O[2] + radius * cos(theta) * AOnorm[2] + radius * sin(theta) * BOnorm[2];
@@ -1048,7 +985,6 @@ Vector* MJMotionProfile::compute(double t){
     Vector distance = (*xd) - xPrev;
     yInfo("travelled distance x = %f , travelled distance y = %f absolute = %f", distance[1]/(t-tprev), distance[2]/(t-tprev),
     sqrt(distance[1] * distance[1] + distance[2] * distance[2])/(t-tprev));
-
 
     // updating the previous incremental step values
     radiusPrev =  radius;
@@ -1134,34 +1070,23 @@ void GVPMotionProfile::preComputation(const double t, const double theta){
   radius = computeRadius(theta);
 
   yInfo("computed radius %f [m] for tangVelocity %f [m/s]", radius, tanVelocity);
-  // computing angular velocity in function of the radius, theta, tangential velocity
-  //angVelocity = computeAngVelocity(theta);
 
-  // Written by @Luca
-  //--------------------------------------------------------------------------
-  //IMPONGO LA VELOCITA TANGENZIALE E RICAVO LA VELOCITA ANGOLARE USATA NELLA FORMULA
-  // the formula is Tan_vel = r *ang_vel
+  //IMPOSE THE TANGENTIAL VELOCITY AND COMPUTE THE CORRESPONDING ANGULAR VELOCITY
 
-  // iteratively read the velocity profile and impose the tang. velocity
+  // iteratively read the velocity profile and impose the tang velocity
   tanVelocity = velocityProfile[step_counter];
 
-  if (step_counter < velocityProfile.size()-1) {
-    step_counter = step_counter+1;
-  }
+  // increment the step counter
+  if (step_counter < velocityProfile.size()-1) {step_counter++;}
 
-  // std::cout << "read velocity" << tanVelocity << std::endl;
-  // std::cout << "step counter" << step_counter << std::endl;
-  // std::cout << "motion profile size: " << velocityProfile.size() << std::endl;
-
+  //evaluate corresponding angular velocity
   angVelocity = tanVelocity / radius;
-  //--------------------------------------------------------------------------
 
   yInfo("computed angular velocity %f in rad/s", angVelocity);
   double tanVelocity_temp = checkTanVelocity(theta);
 
   yInfo("desired  tang velocity %f in m/s", tanVelocity);
   yInfo("computed tang velocity %f in m/s", tanVelocity_temp);
-
   yInfo("theta angle [rad] %f", theta);
 }
 
@@ -1169,13 +1094,11 @@ Vector* GVPMotionProfile::compute(double t){
 
   yDebug("****************** STEP %i/%li **********************", step_counter, velocityProfile.size());
 
-  const float delta_time = 0.01;
-  double thetaStart;
+  const float delta_time = 0.01; // [s]
 
   if(t-t0 == 0){
       step_counter = 0;
       theta = theta_start;
-      thetaStart =  theta_start;
   }
   else {
       while (t-tprev < delta_time && t-t0 != 0){t=Time::now();} //wait the end of the time step
@@ -1210,6 +1133,7 @@ Vector* GVPMotionProfile::compute(double t){
   return xd;
 }
 
+// to be removed
 Matrix GVPMotionProfile::offline_compute(yarp::dev::ICartesianControl *icart, yarp::dev::IEncoders *encs) {
     yInfo("OFFLINE JOINTS TRAJECTORY COMPUTATION FOR GVP CLASS");
     std::ofstream myfile ("Velocity_Report.csv");

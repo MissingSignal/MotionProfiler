@@ -116,7 +116,7 @@ bool handProfilerModule::configure(yarp::os::ResourceFinder &rf) {
 
     /* get the module name which will form the stem of all module port names */
     moduleName            = rf.check("name",
-                           Value("/handProfiler"),
+                           Value("/motionProfiler"),
                            "module name (string)").asString();
     /*
     * before continuing, set the module name before getting any other parameters,
@@ -255,7 +255,7 @@ bool handProfilerModule::respond(const Bottle& command, Bottle& reply)
             reply.addString("GEN GVP  : generate general velocity profile");
             reply.addString("         : (((O -0.3 -0.0 0.1) (A -0.3 0.1 0.1) (B -0.3 -0.0 0.2) (theta 0.0 1.57) (param 0.1)))");
             reply.addString("GEN TTPL : generate NON two-third power law profile");
-            reply.addString("         : (((O -0.3 -0.1 0.1) (A -0.3 -0.0 0.1) (B -0.3 -0.1 0.3) (theta 0.0 1.57) (param 0.1 0.33)))");
+            reply.addString("         : (((O -0.3 -0.1 0.1) (A -0.3 -0.0 0.1) (B -0.3 -0.1 0.3) (theta 0.0 1.57)))");
             reply.addString("GEN TTL : generate two-third power law profile");
             reply.addString("         : (((O -0.3 -0.1 0.1) (A -0.3 -0.0 0.1) (B -0.3 -0.1 0.3) (theta 0.0 1.57) (param 0.01 0.33)))");
 

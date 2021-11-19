@@ -37,8 +37,8 @@ int main(int argc, char * argv[])
 
     ResourceFinder rf;
     rf.setVerbose(true);
-    rf.setDefaultConfigFile("handProfiler.ini");      //overridden by --from parameter
-    rf.setDefaultContext("handProfiler");              //overridden by --context parameter
+    rf.setDefaultConfigFile("motionProfiler.ini");      //overridden by --from parameter
+    rf.setDefaultContext("motionProfiler");              //overridden by --context parameter
     rf.configure(argc, argv);
     yInfo("argc %d", argc);
     for (int i=0; i<argc; i++)
